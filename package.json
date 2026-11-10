@@ -1,0 +1,41 @@
+{
+  "name": "scopekit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "npm@12.2.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "vitest run",
+    "db:generate": "npm run generate -w @scopekit/db",
+    "db:migrate": "npm run migrate -w @scopekit/db",
+    "demo:seed": "tsx --env-file-if-exists=.env scripts/demo-seed.ts",
+    "demo:clear": "tsx --env-file-if-exists=.env scripts/demo-seed.ts --clear",
+    "size:tracker": "npm run size -w @scopekit/sdk",
+    "test:e2e": "tsx --env-file-if-exists=.env tests/e2e-tracking.ts",
+    "test:gsc": "tsx --env-file-if-exists=.env tests/e2e-gsc.ts",
+    "test:audit": "tsx --env-file-if-exists=.env tests/e2e-audit.ts",
+    "test:health": "tsx --env-file-if-exists=.env tests/e2e-health.ts"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.65.0",
+    "tsx": "^4",
+    "turbo": "^2",
+    "typescript": "^5",
+    "vitest": "^3",
+    "@scopekit/db": "*",
+    "@scopekit/analytics": "*",
+    "@scopekit/contracts": "*",
+    "drizzle-orm": "^0.45.2",
+    "@scopekit/seo": "*",
+    "@scopekit/audit": "*",
+    "@scopekit/health": "*"
+  }
+}

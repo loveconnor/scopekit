@@ -1,0 +1,14 @@
+{
+  "name": "@scopekit/health",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": { "typecheck": "tsc --noEmit" },
+  "dependencies": {
+    "@scopekit/analytics": "*",
+    "@scopekit/contracts": "*",
+    "@scopekit/db": "*"
+  },
+  "devDependencies": { "@types/node": "^24" }
+}

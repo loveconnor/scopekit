@@ -1,0 +1,26 @@
+{
+  "name": "@scopekit/worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=../../.env src/index.ts",
+    "build": "tsup",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@scopekit/analytics": "*",
+    "@scopekit/audit": "*",
+    "@scopekit/contracts": "*",
+    "@scopekit/db": "*",
+    "@scopekit/health": "*",
+    "@scopekit/seo": "*",
+    "bullmq": "^5",
+    "ioredis": "^5"
+  },
+  "devDependencies": {
+    "@types/node": "^24",
+    "tsup": "^8"
+  }
+}

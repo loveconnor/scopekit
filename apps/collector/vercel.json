@@ -1,0 +1,9 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "cd ../.. && npm ci",
+  "buildCommand": "cd ../.. && npm run build -w @scopekit/sdk && SCOPEKIT_BUILD_TARGET=vercel npm run build -w @scopekit/collector",
+  "outputDirectory": "public",
+  "rewrites": [{ "source": "/((?!robots\\.txt$).*)", "destination": "/api" }],
+  "functions": { "api/index.js": { "maxDuration": 10 } }
+}

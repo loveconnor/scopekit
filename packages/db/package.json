@@ -1,0 +1,19 @@
+{
+  "name": "@scopekit/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": { ".": "./src/index.ts", "./schema": "./src/schema.ts" },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "generate": "drizzle-kit generate",
+    "migrate": "tsx --env-file-if-exists=../../.env src/migrate.ts"
+  },
+  "dependencies": {
+    "@scopekit/analytics": "*",
+    "@scopekit/contracts": "*",
+    "drizzle-orm": "^0.45.2",
+    "postgres": "^3"
+  },
+  "devDependencies": { "drizzle-kit": "^0.31", "@types/node": "^24" }
+}

@@ -1,0 +1,20 @@
+{
+  "name": "@scopekit/audit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@scopekit/contracts": "*",
+    "htmlparser2": "^10",
+    "@scopekit/db": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^24"
+  }
+}

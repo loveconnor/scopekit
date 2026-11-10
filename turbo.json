@@ -1,0 +1,45 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    ".env"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**"
+      ],
+      "env": [
+        "DATABASE_URL",
+        "DATABASE_URL_UNPOOLED",
+        "REDIS_URL",
+        "BETTER_AUTH_*",
+        "SCOPEKIT_*",
+        "NEXT_PUBLIC_*",
+        "GOOGLE_*",
+        "GITHUB_*",
+        "RESEND_API_KEY",
+        "GSC_*",
+        "CRAWLER_*",
+        "COLLECTOR_*"
+      ]
+    },
+    "dev": {
+      "dependsOn": [
+        "^build"
+      ],
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {},
+    "typecheck": {
+      "dependsOn": [
+        "^build"
+      ]
+    }
+  }
+}

@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: scopekit
+        ports: ["5432:5432"]
+        options: --health-cmd "pg_isready" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/scopekit
+      BETTER_AUTH_SECRET: ci-only-secret-ci-only-secret-ci-only
+      NEXT_PUBLIC_COLLECTOR_URL: http://localhost:8787
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # Tracker stays under its 5 KB gzip budget.
+      - run: npm run size:tracker
+      - run: npm test
+      - run: npm run db:migrate
+      # Search Console sync against a stand-in Google server.
+      - run: npm run test:gsc
+      # Crawler against a fixture site; lab runs and alerts against a stand-in provider.
+      - run: npm run test:audit
+      - run: npm run test:health
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build

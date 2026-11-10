@@ -1,26 +1,252 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+/* Layered so Tailwind utilities and the ScopeKit tokens below take precedence. */
+@import "honestui/theme.css" layer(base);
+@import "honestui/charts.css" layer(base);
+
+@custom-variant dark (&:is(.dark *));
+
+/* --------------------------------------------------------------------------
+ * ScopeKit tokens (spec 5.2), layered over the Honest UI theme.
+ * Neutral grays with no hue. Emphasis is ink (black on light, white on dark);
+ * color is kept for meaning only: up, down, warning, error.
+ * ----------------------------------------------------------------------- */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --hui-font-love-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --hui-font-mono: var(--font-geist-mono), ui-monospace, Menlo, monospace;
+
+  /* Spec: inputs and buttons 8px, cards 10px. Borders carry depth, not shadows. */
+  --hui-radius-1: 6px;
+  --hui-radius-2: 8px;
+  --hui-radius-3: 10px;
+  --hui-radius-card: 10px;
+  --hui-radius-dialog: 14px;
+  --hui-border-width-surface: 1px;
+  --hui-font-size-control: 13px;
+  --hui-letter-spacing-regular: 0;
+  --hui-letter-spacing-large: 0;
+  --hui-shadow-soft: none;
+
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+:root[data-theme="light"] {
+  --sk-canvas: #fbfbfb;
+  --sk-surface: #ffffff;
+  --sk-muted-surface: #f3f3f3;
+  --sk-border: #e8e8e8;
+  --sk-text: #0f0f0f;
+  --sk-text-secondary: #525252;
+  --sk-text-muted: #6b6b6b;
+  /* Emphasis is ink, not a hue: the primary button is black, the selection is a gray step. */
+  --sk-accent: #0f0f0f;
+  --sk-accent-ink: #0f0f0f;
+  --sk-on-accent: #ffffff;
+  --sk-negative: #c4413a;
+  --sk-warning: #a3670d;
+  --sk-positive: #2e7d4f;
+
+  /* Chart series: ink leads, the rest are gray steps. */
+  --sk-series-1: #0f0f0f;
+  --sk-series-2: #6b6b6b;
+  --sk-series-3: #a3a3a3;
+  --sk-series-4: #c4c4c4;
+  --sk-series-5: #d9d9d9;
+  --sk-series-quiet: #d4d4d4;
+
+  --hui-accent-1: oklch(0.99 0 0);
+  --hui-accent-2: oklch(0.975 0 0);
+  --hui-accent-3: oklch(0.955 0 0);
+  --hui-accent-4: oklch(0.93 0 0);
+  --hui-accent-5: oklch(0.9 0 0);
+  --hui-accent-6: oklch(0.86 0 0);
+  --hui-accent-7: oklch(0.79 0 0);
+  --hui-accent-8: oklch(0.68 0 0);
+  --hui-accent-9: #0f0f0f;
+  --hui-accent-10: #2a2a2a;
+  --hui-accent-11: #0f0f0f;
+  --hui-accent-12: #0f0f0f;
+  --hui-accent-contrast: #ffffff;
+
+  --hui-danger-9: #c4413a;
+  --hui-danger-10: #ad3832;
+  --hui-danger-11: #a8352f;
+}
+
+:root[data-theme="dark"] {
+  --sk-canvas: #0a0a0a;
+  --sk-surface: #121212;
+  --sk-muted-surface: #1c1c1c;
+  --sk-border: #262626;
+  --sk-text: #f5f5f5;
+  --sk-text-secondary: #b3b3b3;
+  --sk-text-muted: #8f8f8f;
+  --sk-accent: #f5f5f5;
+  --sk-accent-ink: #f5f5f5;
+  --sk-on-accent: #0a0a0a;
+  --sk-negative: #ef8a83;
+  --sk-warning: #e0ac5c;
+  --sk-positive: #7fc79a;
+
+  --sk-series-1: #f5f5f5;
+  --sk-series-2: #9a9a9a;
+  --sk-series-3: #6b6b6b;
+  --sk-series-4: #4d4d4d;
+  --sk-series-5: #3a3a3a;
+  --sk-series-quiet: #3d3d3d;
+
+  --hui-accent-1: oklch(0.17 0 0);
+  --hui-accent-2: oklch(0.2 0 0);
+  --hui-accent-3: oklch(0.24 0 0);
+  --hui-accent-4: oklch(0.28 0 0);
+  --hui-accent-5: oklch(0.32 0 0);
+  --hui-accent-6: oklch(0.37 0 0);
+  --hui-accent-7: oklch(0.44 0 0);
+  --hui-accent-8: oklch(0.55 0 0);
+  --hui-accent-9: #f5f5f5;
+  --hui-accent-10: #e0e0e0;
+  --hui-accent-11: #f5f5f5;
+  --hui-accent-12: #f5f5f5;
+  --hui-accent-contrast: #0a0a0a;
+
+  --hui-danger-9: #ef8a83;
+  --hui-danger-11: #ef8a83;
+  --hui-danger-contrast: #0a0a0a;
+}
+
+
+:root[data-theme="light"],
+:root[data-theme="dark"] {
+  /* No theme cross-fade: a color change is instant, like any other state change. */
+  transition: none;
+
+  --hui-color-background-base-primary: var(--sk-surface);
+  --hui-color-background-base-secondary: var(--sk-canvas);
+  --hui-color-background-base-primary-hover: var(--sk-muted-surface);
+  --hui-color-background-neutral-primary: var(--sk-muted-surface);
+  --hui-color-background-neutral-secondary: var(--sk-muted-surface);
+  --hui-color-background-neutral-secondary-hover: var(--sk-border);
+  --hui-color-foreground-base-primary: var(--sk-text);
+  --hui-color-foreground-base-secondary: var(--sk-text-secondary);
+  --hui-color-foreground-base-tertiary: var(--sk-text-muted);
+  --hui-color-border-base-primary: var(--sk-border);
+  --hui-color-border-base-secondary: var(--sk-border);
+
+  --background: var(--sk-canvas);
+  --foreground: var(--sk-text);
+  --card: var(--sk-surface);
+  --card-foreground: var(--sk-text);
+  --popover: var(--sk-surface);
+  --popover-foreground: var(--sk-text);
+  --primary: var(--sk-accent);
+  --primary-foreground: var(--sk-on-accent);
+  --secondary: var(--sk-muted-surface);
+  --secondary-foreground: var(--sk-text);
+  --muted: var(--sk-muted-surface);
+  --muted-foreground: var(--sk-text-muted);
+  --accent: var(--sk-muted-surface);
+  --accent-foreground: var(--sk-text);
+  --destructive: var(--sk-negative);
+  --border: var(--sk-border);
+  --input: var(--sk-border);
+  --ring: var(--sk-accent);
 }
 
 @theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, Menlo, monospace;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-canvas: var(--sk-canvas);
+  --color-surface: var(--sk-surface);
+  --color-raised: var(--sk-muted-surface);
+  --color-line: var(--sk-border);
+  --color-ink: var(--sk-text);
+  --color-ink-2: var(--sk-text-secondary);
+  --color-ink-3: var(--sk-text-muted);
+  --color-strong: var(--sk-accent);
+  --color-on-strong: var(--sk-on-accent);
+  --color-negative: var(--sk-negative);
+  --color-warning: var(--sk-warning);
+  --color-positive: var(--sk-positive);
+
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    border-color: var(--sk-border);
+  }
+  html {
+    background: var(--sk-canvas);
+    color-scheme: light;
+  }
+  html[data-theme="dark"] {
+    color-scheme: dark;
+  }
+  body {
+    background: var(--sk-canvas);
+    color: var(--sk-text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 20px;
+    font-feature-settings: "ss01", "cv11";
+  }
+  :focus-visible {
+    outline: 2px solid var(--sk-accent);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--sk-text) 14%, transparent);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The one entrance on load: page content fades and rises once. */
+@keyframes sk-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+.sk-enter {
+  animation: sk-enter 360ms var(--ease) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk-enter {
+    animation: none;
+  }
+}
+
+@media print {
+  [data-chrome] {
+    display: none !important;
+  }
 }

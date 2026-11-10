@@ -1,0 +1,19 @@
+{
+  "name": "@scopekit/sdk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./next": "./src/next.tsx",
+    "./script": "./dist/script.js"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "size": "node build.mjs --check",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": { "react": ">=18" },
+  "peerDependenciesMeta": { "react": { "optional": true } },
+  "devDependencies": { "esbuild": "^0.25", "@types/react": "^19" }
+}
