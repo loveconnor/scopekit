@@ -1,6 +1,7 @@
 "use client";
 
-import { buildSnippet, CodeBlock, VerifyTracking } from "@/components/scopekit/install";
+import { CodeBlock, VerifyTracking } from "@/components/scopekit/install";
+import { buildSnippet } from "@/lib/snippet";
 import { Panel } from "@/components/scopekit/panel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

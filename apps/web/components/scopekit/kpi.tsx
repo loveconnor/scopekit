@@ -77,7 +77,7 @@ export function Kpi({ label, value, unavailable, change, delta, comparedTo, note
             ) : note ? (
               note
             ) : comparedTo ? (
-              `No earlier data ${comparedTo.replace(/^vs /, "for the ")}`
+              `No earlier data ${comparedTo.replace(/^vs (previous )?/, (_m, previous: string | undefined) => (previous ? "for the previous " : "for "))}`
             ) : null}
           </p>
         </>

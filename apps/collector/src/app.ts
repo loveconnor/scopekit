@@ -13,7 +13,7 @@ import {
   type ClassifiedSource,
 } from "@scopekit/analytics";
 import { COLLECT_LIMITS, collectEventSchema, INGEST_QUEUE, type CollectEvent, type QueuedEvent } from "@scopekit/contracts";
-import { getDb, getVisitorSalt, loadCollectorSite, type CollectorSite } from "@scopekit/db";
+import { getDb, getVisitorSalt, insertEvents, loadCollectorSite, type CollectorSite } from "@scopekit/db";
 import { Queue } from "bullmq";
 import { Hono, type Context } from "hono";
 import { Redis } from "ioredis";
@@ -31,9 +31,15 @@ const log = (level: "info" | "warn" | "error", msg: string, fields: Record<strin
   console.log(JSON.stringify({ level, msg, service: "collector", time: new Date().toISOString(), ...fields }));
 
 const db = getDb();
-const redis = new Redis(process.env.REDIS_URL ?? "redis://localhost:6379", { maxRetriesPerRequest: 2, enableOfflineQueue: false });
-redis.on("error", (error) => log("error", "redis error", { error: error.message }));
-const queue = new Queue(INGEST_QUEUE, { connection: redis });
+/**
+ * With REDIS_URL, events go through the BullMQ queue to the worker, and Redis holds rate
+ * limits and session sources. Without it (the Vercel deployment), events are written straight
+ * to Postgres, which is idempotent on event ID, and limits are kept per instance in memory.
+ */
+const REDIS_URL = process.env.REDIS_URL || null;
+const redis = REDIS_URL ? new Redis(REDIS_URL, { maxRetriesPerRequest: 2, enableOfflineQueue: false }) : null;
+redis?.on("error", (error) => log("error", "redis error", { error: error.message }));
+const queue = redis ? new Queue(INGEST_QUEUE, { connection: redis }) : null;
 
 // The Vercel build inlines the tracker; a Node server reads the built file from the SDK package.
 declare const __SCOPEKIT_TRACKER__: string | undefined;
@@ -104,10 +110,23 @@ function requestHost(c: Context): { host: string; hostname: string; origin: stri
   }
 }
 
+// Best effort without Redis: each function instance counts on its own.
+const memoryCounts = new Map<string, number>();
+const memorySessions = new Map<string, { source: ClassifiedSource; expires: number }>();
+
 async function overLimit(siteId: string, ip: string): Promise<boolean> {
   const minute = Math.floor(Date.now() / 60_000);
   const clientKey = `sk:rl:${siteId}:${sha(ip).slice(0, 16)}:${minute}`;
   const siteKey = `sk:rl:${siteId}:all:${minute}`;
+  if (!redis) {
+    const count = (key: string) => {
+      const next = (memoryCounts.get(key) ?? 0) + 1;
+      memoryCounts.set(key, next);
+      return next;
+    };
+    if (memoryCounts.size > 20_000) memoryCounts.clear();
+    return count(clientKey) > RATE_PER_CLIENT || count(siteKey) > RATE_PER_SITE;
+  }
   const results = await redis.multi().incr(clientKey).expire(clientKey, 90).incr(siteKey).expire(siteKey, 90).exec();
   const perClient = Number(results?.[0]?.[1] ?? 0);
   const perSite = Number(results?.[2]?.[1] ?? 0);
@@ -120,6 +139,14 @@ async function overLimit(siteId: string, ip: string): Promise<boolean> {
  */
 async function sessionSource(sessionKey: string, first: ClassifiedSource): Promise<ClassifiedSource> {
   const key = `sk:sess:${sessionKey}`;
+  if (!redis) {
+    // Rollups take a session's source from its first event anyway; this only helps raw views.
+    const hit = memorySessions.get(key);
+    if (hit && hit.expires > Date.now()) return hit.source;
+    if (memorySessions.size > 20_000) memorySessions.clear();
+    memorySessions.set(key, { source: first, expires: Date.now() + SESSION_TTL_SECONDS * 1000 });
+    return first;
+  }
   try {
     const existing = await redis.get(key);
     if (existing) {
@@ -272,9 +299,10 @@ app.post("/api/collect", async (c) => {
 
   if (events.length > 0) {
     try {
-      await queue.add("events", { events }, { attempts: 8, backoff: { type: "exponential", delay: 2000 }, removeOnComplete: 500, removeOnFail: 5000 });
+      if (queue) await queue.add("events", { events }, { attempts: 8, backoff: { type: "exponential", delay: 2000 }, removeOnComplete: 500, removeOnFail: 5000 });
+      else await insertEvents(db, events);
     } catch (error) {
-      log("error", "enqueue failed", { error: (error as Error).message });
+      log("error", queue ? "enqueue failed" : "insert failed", { error: (error as Error).message });
       return fail(503, "queue_unavailable");
     }
   }

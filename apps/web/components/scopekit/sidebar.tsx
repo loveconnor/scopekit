@@ -1,19 +1,39 @@
 "use client";
 
 import { GLOBAL_NAV, isActive, siteNav, type NavItem } from "@/lib/nav";
+import { RANGE_KEYS } from "@/lib/params";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { useParams, usePathname } from "next/navigation";
+import { useParams, usePathname, useSearchParams } from "next/navigation";
 import { Logo } from "./logo";
 import { NavIcon } from "./nav-icon";
 
 export type ShellSite = { id: string; name: string; hostname: string; isDemo: boolean };
 
+/**
+ * Filters (page, source, country and so on) belong to one site's analytics reports, so they
+ * follow the link only between those pages. Range and comparison follow everywhere through
+ * the saved-view cookie.
+ */
+function useCarriedQuery(href: string, pathname: string): string {
+  const searchParams = useSearchParams();
+  const analytics = (path: string) => /^\/sites\/[^/]+\/analytics(\/|$)/.test(path);
+  const sameSite = href.split("/").slice(0, 3).join("/") === pathname.split("/").slice(0, 3).join("/");
+  const carried = new URLSearchParams();
+  for (const [key, value] of searchParams) {
+    if (RANGE_KEYS.includes(key as (typeof RANGE_KEYS)[number])) carried.append(key, value);
+    else if (key.startsWith("f_") && sameSite && analytics(href) && analytics(pathname)) carried.append(key, value);
+  }
+  const query = carried.toString();
+  return query ? `${href}?${query}` : href;
+}
+
 function NavLink({ item, pathname, onNavigate }: { item: NavItem; pathname: string; onNavigate?: () => void }) {
   const active = isActive(pathname, item);
+  const href = useCarriedQuery(item.href, pathname);
   return (
     <Link
-      href={item.href}
+      href={href}
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cn(

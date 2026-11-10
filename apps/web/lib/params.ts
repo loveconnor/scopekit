@@ -69,3 +69,42 @@ export const FILTER_LABELS: Record<FilterDimension, string> = {
   device: "Device",
   browser: "Browser",
 };
+
+/** Cookie that remembers the last range and comparison picked, across pages and visits. */
+export const VIEW_COOKIE = "scopekit.view";
+export const RANGE_KEYS = ["range", "from", "to", "compare"] as const;
+
+/**
+ * Fills in the range and comparison from the saved choice when the URL has none. A URL that
+ * names a range always wins, so shared links show exactly what they say.
+ */
+export function withSavedView(params: SearchParams, saved: string | undefined): SearchParams {
+  if (!saved) return params;
+  let stored: URLSearchParams;
+  try {
+    stored = new URLSearchParams(saved);
+  } catch {
+    return params;
+  }
+  const next: SearchParams = { ...params };
+  const hasRange = params.range !== undefined || params.from !== undefined || params.to !== undefined;
+  if (!hasRange) {
+    for (const key of ["range", "from", "to"] as const) {
+      const value = stored.get(key);
+      if (value) next[key] = value.slice(0, 20);
+    }
+  }
+  if (params.compare === undefined && stored.get("compare") === "0") next.compare = "0";
+  return next;
+}
+
+/** Saves the range and comparison of a query string in the view cookie (browser only). */
+export function saveViewCookie(query: URLSearchParams) {
+  const saved = new URLSearchParams();
+  for (const key of RANGE_KEYS) {
+    const value = query.get(key);
+    if (value) saved.set(key, value);
+  }
+  const secure = window.location.protocol === "https:" ? "; secure" : "";
+  document.cookie = `${VIEW_COOKIE}=${encodeURIComponent(saved.toString())}; path=/; max-age=31536000; samesite=lax${secure}`;
+}

@@ -9,7 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import type { PrivacyMode, UpdateSiteInput } from "@scopekit/contracts";
 import { useRouter } from "next/navigation";
 import { useId, useMemo, useState } from "react";
-import { buildSnippet, CodeBlock, VerifyTracking } from "./install";
+import { buildSnippet } from "@/lib/snippet";
+import { CodeBlock, VerifyTracking } from "./install";
 import { Panel } from "./panel";
 
 export type SettingsSite = {

@@ -3,6 +3,7 @@
 import { DateRangePicker } from "@/components/ui/date-range-picker/date-range-picker";
 import { Switch } from "@/components/ui/switch";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { saveViewCookie } from "@/lib/params";
 import type { RangePreset } from "@scopekit/contracts";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useId, useTransition } from "react";
@@ -58,6 +59,13 @@ export function RangeControl({
       else next.set(key, value);
     }
     next.delete("cursor");
+    // The range in the URL may have come from the saved choice; keep it explicit from here on.
+    if (!next.has("range") && !patch.range) next.set("range", preset);
+    if (next.get("range") === "custom" && !next.has("from")) {
+      next.set("from", from);
+      next.set("to", to);
+    }
+    saveViewCookie(next);
     const query = next.toString();
     startTransition(() => router.push(query ? `${pathname}?${query}` : pathname, { scroll: false }));
   };

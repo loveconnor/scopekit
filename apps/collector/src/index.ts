@@ -10,8 +10,8 @@ const server = serve({ fetch: app.fetch, port: PORT }, () => log("collector list
 
 const shutdown = async () => {
   server.close();
-  await queue.close().catch(() => {});
-  redis.disconnect();
+  await queue?.close().catch(() => {});
+  redis?.disconnect();
   process.exit(0);
 };
 process.on("SIGTERM", shutdown);

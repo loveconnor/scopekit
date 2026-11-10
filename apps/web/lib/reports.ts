@@ -54,6 +54,20 @@ export const loadPreferences = cache(async () => {
   return getPreferences(getDb(), user.id);
 });
 
+/**
+ * Default ranges cover complete days only, so a site whose first event arrived today would
+ * open on a page of zeros. Until some site has a full day of data, the default is Today
+ * instead. A range picked in the URL is always kept.
+ */
+export function defaultToTodayForNewSites(view: ViewState, sites: { timezone: string; firstEventAt: Date | null }[]): ViewState {
+  if (view.range.preset || view.range.from || view.range.to) return view;
+  const tracked = sites.filter((s) => s.firstEventAt);
+  if (!tracked.length) return view;
+  const now = new Date();
+  const noCompleteDay = tracked.every((s) => localDateOf(s.firstEventAt!, s.timezone) >= localDateOf(now, s.timezone));
+  return noCompleteDay ? { ...view, range: { ...view.range, preset: "today" } } : view;
+}
+
 export async function rangeFor(view: ViewState, timeZone: string): Promise<ResolvedRange> {
   const preset = view.range.preset ?? (await loadPreferences()).defaultRange;
   return resolveRange({ preset, from: view.range.from, to: view.range.to, timeZone });

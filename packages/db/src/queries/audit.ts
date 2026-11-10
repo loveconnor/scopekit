@@ -68,7 +68,7 @@ export async function scheduleDueCrawls(db: Database): Promise<number> {
 }
 
 /** Marks queued runs as running and returns them. Runs whose worker stopped reporting are closed as failed first. */
-export async function claimQueuedCrawls(db: Database, staleMinutes = 10): Promise<string[]> {
+export async function claimQueuedCrawls(db: Database, staleMinutes = 10, limit = 10): Promise<string[]> {
   await db.execute(
     sql`update crawl_runs set status = 'error', finished_at = now(), error_summary = 'The worker stopped before the crawl finished'
         where status in ('running', 'cancelling') and coalesce(heartbeat_at, started_at) < now() - make_interval(mins => ${staleMinutes})`,
@@ -76,10 +76,26 @@ export async function claimQueuedCrawls(db: Database, staleMinutes = 10): Promis
   const claimed = await rows<{ id: string }>(
     db,
     sql`update crawl_runs r set status = 'running', started_at = now(), heartbeat_at = now()
-        where r.id in (select id from crawl_runs where status = 'queued' order by queued_at limit 10 for update skip locked)
+        where r.id in (select id from crawl_runs where status = 'queued' order by queued_at limit ${limit} for update skip locked)
         returning r.id`,
   );
   return claimed.map((r) => r.id);
+}
+
+/** Claims one queued run by ID. Returns false when someone else already took it. */
+export async function claimCrawl(db: Database, id: string): Promise<boolean> {
+  const claimed = await db
+    .update(crawlRuns)
+    .set({ status: "running", startedAt: new Date(), heartbeatAt: new Date() })
+    .where(and(eq(crawlRuns.id, id), eq(crawlRuns.status, "queued")))
+    .returning({ id: crawlRuns.id });
+  return claimed.length > 0;
+}
+
+/** The oldest queued run, if any. */
+export async function nextQueuedCrawl(db: Database): Promise<string | null> {
+  const [row] = await db.select({ id: crawlRuns.id }).from(crawlRuns).where(eq(crawlRuns.status, "queued")).orderBy(crawlRuns.queuedAt).limit(1);
+  return row?.id ?? null;
 }
 
 export async function getCrawlRun(db: Database, id: string): Promise<CrawlRun | null> {

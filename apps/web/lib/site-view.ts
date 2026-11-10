@@ -1,12 +1,14 @@
 import "server-only";
 import { parseViewState, type SearchParams } from "./params";
-import { loadSite } from "./reports";
+import { defaultToTodayForNewSites, loadSite } from "./reports";
+import { viewParams } from "./view-state";
 
 /** Resolves the site and URL state shared by every site report page. */
 export async function loadSiteView(params: Promise<{ siteId: string }>, searchParams: Promise<SearchParams>) {
-  const [{ siteId }, sp] = await Promise.all([params, searchParams]);
+  const [{ siteId }, raw] = await Promise.all([params, searchParams]);
   const site = await loadSite(siteId);
-  return { site, params: sp, view: parseViewState(sp), base: `/sites/${site.id}` };
+  const sp = await viewParams(raw);
+  return { site, params: sp, view: defaultToTodayForNewSites(parseViewState(sp), [site]), base: `/sites/${site.id}` };
 }
 
 export const SERIES = {

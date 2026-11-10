@@ -24,6 +24,7 @@ import { cache } from "react";
 import { parseViewState, type SearchParams, type ViewState } from "./params";
 import { loadPreferences, loadSite } from "./reports";
 import { requireUser } from "./session";
+import { viewParams } from "./view-state";
 
 /** Google OAuth client plus the key that encrypts its tokens. Null until both are in the environment. */
 export function searchConsoleAccess(): GoogleAccess | null {
@@ -64,8 +65,9 @@ const one = (value: string | string[] | undefined) => (Array.isArray(value) ? va
 
 /** Site, URL state and Search Console connection shared by every SEO page. */
 export async function loadSeoView(params: Promise<{ siteId: string }>, searchParams: Promise<SearchParams>) {
-  const [{ siteId }, sp] = await Promise.all([params, searchParams]);
+  const [{ siteId }, raw] = await Promise.all([params, searchParams]);
   const site = await loadSite(siteId);
+  const sp = await viewParams(raw);
   const conn = await loadSearchConnection(site.id, one(sp.property));
   const view = parseViewState(sp);
   const range = isReady(conn) ? await searchRange(view, conn.active.finalizedThrough) : null;

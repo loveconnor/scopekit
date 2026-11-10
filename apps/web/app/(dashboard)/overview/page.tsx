@@ -10,7 +10,8 @@ import { TrendChart, type TrendRow, type TrendSeries } from "@/components/scopek
 import { Button } from "@/components/ui/button";
 import { computeChange, formatDateTime, formatDay, formatDayLong, formatDayRange, formatRelative } from "@/lib/format";
 import { parseViewState, type SearchParams } from "@/lib/params";
-import { portfolioReport, requestTime } from "@/lib/reports";
+import { viewParams } from "@/lib/view-state";
+import { defaultToTodayForNewSites, loadSites, portfolioReport, requestTime } from "@/lib/reports";
 import { portfolioAudit } from "@/lib/health";
 import { portfolioSearch } from "@/lib/seo";
 import { getDb, listAlerts, listAuditLogs } from "@scopekit/db";
@@ -30,7 +31,7 @@ const SERIES_STYLES = [
 ];
 
 async function OverviewContent({ searchParams }: { searchParams: Promise<SearchParams> }) {
-  const view = parseViewState(await searchParams);
+  const view = defaultToTodayForNewSites(parseViewState(await viewParams(await searchParams)), await loadSites());
   const report = await portfolioReport(view);
   const now = requestTime();
 

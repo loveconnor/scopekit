@@ -1,5 +1,6 @@
 import { BarList } from "@/components/scopekit/bar-list";
-import { buildSnippet, CodeBlock, VerifyTracking } from "@/components/scopekit/install";
+import { CodeBlock, VerifyTracking } from "@/components/scopekit/install";
+import { buildSnippet } from "@/lib/snippet";
 import { AnnotationsPanel, SeverityLabel } from "@/components/scopekit/health";
 import { Kpi, KpiRow, MetricLabel } from "@/components/scopekit/kpi";
 import { PageHeader } from "@/components/scopekit/page-header";
