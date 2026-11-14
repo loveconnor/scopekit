@@ -20,6 +20,14 @@ const JOB_LABELS: Record<string, string> = {
 
 const stamp = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "UTC" });
 
+/** Milliseconds for quick jobs, seconds once a job runs long enough that the digits stop being readable. */
+function formatDuration(ms: number | null): string {
+  if (ms === null) return "–";
+  if (ms < 1000) return `${formatNumber(ms)} ms`;
+  if (ms < 60_000) return `${(ms / 1000).toFixed(1)} s`;
+  return `${Math.floor(ms / 60_000)} min ${Math.round((ms % 60_000) / 1000)} s`;
+}
+
 function describeJob(job: { jobType: string; cursor: Record<string, unknown> | null; errorCode: string | null }) {
   if (job.errorCode) return job.errorCode;
   const c = job.cursor ?? {};
@@ -43,9 +51,9 @@ async function Content() {
   const db = getDb();
   const [changes, jobs] = await Promise.all([listAuditLogs(db, { limit: 50 }), listJobRuns(db, 30)]);
   return (
-    <div className="sk-enter grid gap-4 xl:grid-cols-2">
+    <div className="sk-enter grid items-start gap-4 xl:grid-cols-2">
       <Panel>
-        <PanelHeader title="Changes" description="Sites, goals and settings" />
+        <PanelHeader title="Changes" />
         {changes.length ? (
           <ul className="px-5 pb-4">
             {changes.map((entry) => (
@@ -56,14 +64,14 @@ async function Content() {
             ))}
           </ul>
         ) : (
-          <PanelEmpty title="No changes yet">Adding a site or a goal, or changing a setting, is recorded here</PanelEmpty>
+          <PanelEmpty title="No changes yet" />
         )}
       </Panel>
       <Panel>
-        <PanelHeader title="Background jobs" description="Runs that did work. Quiet aggregation runs are not listed" />
+        <PanelHeader title="Background jobs" />
         {jobs.length ? (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[480px] border-collapse text-[13px]">
+            <table className="w-full min-w-[560px] border-collapse text-[13px]">
               <thead>
                 <tr className="border-y border-line text-[12px] text-ink-3">
                   <th scope="col" className="h-10 pl-5 text-left font-normal">Job</th>
@@ -75,19 +83,19 @@ async function Content() {
               <tbody>
                 {jobs.map((job) => (
                   <tr key={job.id} className="border-b border-line last:border-0">
-                    <th scope="row" className="h-10 pl-5 text-left font-normal text-ink">{JOB_LABELS[job.jobType] ?? job.jobType}</th>
-                    <td className={job.status === "error" ? "h-10 px-3 text-negative" : "h-10 px-3 text-ink-2"}>
+                    <th scope="row" className="h-10 pl-5 text-left font-normal whitespace-nowrap text-ink">{JOB_LABELS[job.jobType] ?? job.jobType}</th>
+                    <td className={job.status === "error" ? "h-10 px-3 py-2 text-negative" : "h-10 px-3 py-2 text-ink-2"}>
                       {job.status === "error" ? `Failed: ${describeJob(job)}` : describeJob(job)}
                     </td>
-                    <td className="tnum h-10 px-3 text-right text-ink-2">{job.durationMs === null ? "–" : `${formatNumber(job.durationMs)} ms`}</td>
-                    <td className="h-10 pr-5 pl-3 text-right font-mono text-[11px] text-ink-3">{stamp.format(job.startedAt)}</td>
+                    <td className="tnum h-10 px-3 text-right whitespace-nowrap text-ink-2">{formatDuration(job.durationMs)}</td>
+                    <td className="h-10 pr-5 pl-3 text-right font-mono text-[11px] whitespace-nowrap text-ink-3">{stamp.format(job.startedAt)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         ) : (
-          <PanelEmpty title="No job runs recorded">Start the worker to aggregate events. Runs appear here once they process something</PanelEmpty>
+          <PanelEmpty title="No job runs recorded">Start the worker to aggregate events</PanelEmpty>
         )}
       </Panel>
     </div>
@@ -97,7 +105,7 @@ async function Content() {
 export default function ActivityPage() {
   return (
     <>
-      <PageHeader title="Activity" subtitle="What changed, and what the worker has been doing" />
+      <PageHeader title="Activity" />
       <Suspense fallback={<PanelSkeleton height={240} />}>
         <Content />
       </Suspense>

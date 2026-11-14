@@ -39,7 +39,7 @@ async function AccountProperties({ site, integration, linked }: { site: SiteDeta
   );
   if (!access) return null;
   if (integration.connectionStatus !== "connected") {
-    return <PanelEmpty title="This account needs reconnecting" action={reconnect}>Google access was revoked or has expired. Data already synced is kept</PanelEmpty>;
+    return <PanelEmpty title="This account needs reconnecting" action={reconnect}>Google access was revoked or expired</PanelEmpty>;
   }
   let entries;
   try {
@@ -47,9 +47,9 @@ async function AccountProperties({ site, integration, linked }: { site: SiteDeta
   } catch (error) {
     if (error instanceof GoogleAuthError) {
       await markIntegrationNeedsReauth(getDb(), integration.id, error.message);
-      return <PanelEmpty title="This account needs reconnecting" action={reconnect}>Google access was revoked or has expired. Data already synced is kept</PanelEmpty>;
+      return <PanelEmpty title="This account needs reconnecting" action={reconnect}>Google access was revoked or expired</PanelEmpty>;
     }
-    return <PanelEmpty title="Google did not answer">The list of properties could not be loaded. Reload the page to try again</PanelEmpty>;
+    return <PanelEmpty title="Google did not answer">Reload the page to try again</PanelEmpty>;
   }
   const properties: AvailableProperty[] = entries
     .flatMap((entry) => {
@@ -97,7 +97,6 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
             <Link href={`/sites/${site.id}/settings`} className="rounded-sm underline decoration-line underline-offset-4 hover:text-ink">
               Site settings
             </Link>
-            {` · ${site.name} · ${site.primaryHostname}`}
           </>
         }
       />
@@ -113,7 +112,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
 
         {conn.properties.length ? (
           <Panel>
-            <PanelHeader title="Linked properties" description="Each property is stored and reported on its own. Two properties for one site are never added together" />
+            <PanelHeader title="Linked properties" />
             <ul>
               {conn.properties.map((property) => {
                 const progress = backfillProgress(property);
@@ -123,7 +122,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
                       <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
                         <span className="truncate font-mono text-[13px] leading-5 text-ink">{propertyLabel(property)}</span>
                         <StatusBadge status={propertyStatus(property, progress)} />
-                        {property.isDemo ? <span className="font-mono text-[11px] text-warning">demo data</span> : null}
+                        {property.isDemo ? <span className="rounded-[4px] border border-line px-1 font-mono text-[11px] leading-4 text-ink-3">demo data</span> : null}
                       </p>
                       <p className="mt-1 text-[12px] leading-4 text-ink-3">
                         {property.externalPropertyType === "domain" ? "Domain property" : "URL-prefix property"} · {property.accountLabel}
@@ -180,9 +179,9 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
               <Panel key={integration.id}>
                 <PanelHeader
                   title={integration.accountLabel}
-                  description={`Connected ${formatRelative(integration.createdAt, now).toLowerCase()} with read-only access. Choose the property that holds ${site.primaryHostname}`}
+                  description={`Connected ${formatRelative(integration.createdAt, now).toLowerCase()} `}
                 />
-                <Suspense fallback={<div className="px-5 pb-5 text-[13px] leading-5 text-ink-3">Asking Google for this account&apos;s properties</div>}>
+                <Suspense fallback={<div className="px-5 pb-5 text-[13px] leading-5 text-ink-3">Loading properties</div>}>
                   <AccountProperties site={site} integration={integration} linked={conn.properties} />
                 </Suspense>
               </Panel>
@@ -205,13 +204,13 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
 
         {site.isDemo && !conn.properties.length ? (
           <Panel>
-            <PanelEmpty title="Demo sites cannot be connected">Run the demo seed again to add synthetic search data</PanelEmpty>
+            <PanelEmpty title="Demo sites cannot be connected" />
           </Panel>
         ) : null}
 
         {runs.length ? (
           <Panel>
-            <PanelHeader title="Recent syncs" description="Days are Pacific Time" />
+            <PanelHeader title="Recent syncs" />
             <div className="overflow-x-auto">
               <table className="w-full min-w-[640px] border-collapse text-[13px]">
                 <thead>
@@ -248,7 +247,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
 
 export default function SearchConsoleSettingsPage({ params, searchParams }: PageProps<"/sites/[siteId]/settings/search-console">) {
   return (
-    <div className="mx-auto max-w-[960px]">
+    <div className="max-w-[960px]">
       <Suspense
         fallback={
           <>

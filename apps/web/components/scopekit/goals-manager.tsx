@@ -180,7 +180,8 @@ export function GoalsManager({ siteId, goals, sessions, retentionDays }: { siteI
         <AddGoalDialog siteId={siteId} retentionDays={retentionDays} />
       </div>
       {goals.length ? (
-        <div className="overflow-x-auto">
+        // `relative` keeps each switch's hidden input inside the scroll area, so it cannot widen the page on a phone.
+        <div className="relative overflow-x-auto">
           <table className="w-full min-w-[760px] border-collapse text-[13px]">
             <thead>
               <tr className="border-y border-line text-[12px] text-ink-3">

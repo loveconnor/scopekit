@@ -23,9 +23,11 @@ export function Provenance({
   detail?: string | null;
   className?: string;
 }) {
+  // ScopeKit is the default source: its tag only shows when it carries a fact.
+  if (source === "scopekit" && !detail) return null;
   return (
-    <span className={cn("inline-flex items-center gap-1.5 font-mono text-[11px] leading-4 text-ink-3", className)}>
-      <span aria-hidden="true" className="size-1.5 rounded-[1px] bg-current opacity-70" />
+    <span className={cn("inline-flex items-start gap-1.5 font-mono text-[11px] leading-4 text-ink-3", className)}>
+      <span aria-hidden="true" className="mt-[5px] size-1.5 shrink-0 rounded-[1px] bg-current opacity-70" />
       <span>
         {SOURCE_LABELS[source]}
         {detail ? ` · ${detail}` : ""}

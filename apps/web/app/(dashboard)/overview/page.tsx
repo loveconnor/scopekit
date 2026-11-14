@@ -2,7 +2,6 @@ import { Kpi, KpiRow, MetricLabel } from "@/components/scopekit/kpi";
 import { FirstRun } from "@/components/scopekit/onboarding";
 import { PageHeader } from "@/components/scopekit/page-header";
 import { KpiSkeletonRow, Panel, PanelEmpty, PanelHeader, PanelSkeleton } from "@/components/scopekit/panel";
-import { Provenance } from "@/components/scopekit/provenance";
 import { RangeControl } from "@/components/scopekit/range-control";
 import { SitesTable, type SiteRow } from "@/components/scopekit/sites-table";
 import { siteStatus } from "@/components/scopekit/status";
@@ -38,7 +37,7 @@ async function OverviewContent({ searchParams }: { searchParams: Promise<SearchP
   if (report.sites.length === 0 || !report.range) {
     return (
       <>
-        <PageHeader title="All websites" subtitle="Your websites at a glance" />
+        <PageHeader title="All websites" />
         <FirstRun />
       </>
     );
@@ -48,11 +47,6 @@ async function OverviewContent({ searchParams }: { searchParams: Promise<SearchP
   const siteIds = report.sites.map((s) => s.site.id);
   const [search, audit, openAlerts] = await Promise.all([portfolioSearch(siteIds, view), portfolioAudit(siteIds), listAlerts(getDb(), { siteIds, statuses: ["open"], limit: 5 })]);
   const comparedTo = `vs previous ${range.days === 1 ? "day" : `${range.days} days`}`;
-  const through = !report.freshThrough
-    ? "no events yet"
-    : range.includesToday
-      ? `through ${formatDateTime(report.freshThrough, report.sites[0]!.site.timezone)}`
-      : `through ${formatDay(range.to)}`;
   const anyData = report.sites.some((s) => s.hasData);
 
   // One chart, one line per site. The busiest site leads; the rest stay quiet.
@@ -126,7 +120,7 @@ async function OverviewContent({ searchParams }: { searchParams: Promise<SearchP
     <>
       <PageHeader
         title="All websites"
-        subtitle={`${formatDayRange(range.from, range.to)} · each site in its own timezone`}
+        
         actions={
           <>
             <RangeControl preset={range.preset} from={range.from} to={range.to} compare={view.compare} allowHourly={false} />
@@ -147,7 +141,6 @@ async function OverviewContent({ searchParams }: { searchParams: Promise<SearchP
             delta={previous ? totals.pageviews - previous.pageviews : null}
             comparedTo={view.compare ? comparedTo : undefined}
             source="scopekit"
-            sourceDetail={through}
           />
           <Kpi
             label={<MetricLabel metric="summedSiteVisitors" />}
@@ -160,7 +153,7 @@ async function OverviewContent({ searchParams }: { searchParams: Promise<SearchP
             delta={previous?.summedSiteVisitors != null && totals.summedSiteVisitors != null ? totals.summedSiteVisitors - previous.summedSiteVisitors : null}
             comparedTo={view.compare ? comparedTo : undefined}
             source="scopekit"
-            sourceDetail="summed estimates"
+            
           />
           <Kpi
             label="Search clicks"
@@ -183,14 +176,14 @@ async function OverviewContent({ searchParams }: { searchParams: Promise<SearchP
             note={audit.critical === null ? undefined : audit.critical === 0 ? "None open in audited sites" : "Open across audited sites"}
             upIsGood={false}
             source="scopekit"
-            sourceDetail={`crawler · ${audit.bySite.size} of ${report.sites.length} ${report.sites.length === 1 ? "site" : "sites"} audited`}
+            sourceDetail={`${audit.bySite.size} of ${report.sites.length} ${report.sites.length === 1 ? "site" : "sites"} audited`}
           />
         </KpiRow>
 
         <Panel>
           <PanelHeader
             title="Pageviews by website"
-            meta={<Provenance source="scopekit" detail={through} />}
+            
           />
           {anyData ? (
             <div className="pb-4">
@@ -202,17 +195,12 @@ async function OverviewContent({ searchParams }: { searchParams: Promise<SearchP
               />
             </div>
           ) : (
-            <PanelEmpty title="No pageviews in this range">
-              Sites appear here once their snippet reports traffic. A site with no events is not the same as a site with zero visitors
-            </PanelEmpty>
+            <PanelEmpty title="No pageviews in this range" />
           )}
         </Panel>
 
         <Panel>
-          <PanelHeader
-            title="Websites"
-            description={`${report.sites.length} ${report.sites.length === 1 ? "site" : "sites"}. Visitors are per-site estimates`}
-          />
+          <PanelHeader title="Websites" />
           <SitesTable rows={tableRows} />
         </Panel>
 
@@ -258,7 +246,7 @@ async function OverviewContent({ searchParams }: { searchParams: Promise<SearchP
 function OverviewFallback() {
   return (
     <>
-      <PageHeader title="All websites" subtitle="Your websites at a glance" />
+      <PageHeader title="All websites" />
       <div className="flex flex-col gap-4">
         <KpiSkeletonRow />
         <PanelSkeleton height={320} />

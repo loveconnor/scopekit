@@ -26,7 +26,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
   if (!isReady(conn) || !range) {
     return (
       <>
-        <SeoHeader title="Search pages" site={site} conn={conn} range={null} compare={view.compare} params={sp} pathname={pathname} />
+        <SeoHeader title="Search pages" conn={conn} range={null} compare={view.compare} params={sp} pathname={pathname} />
         <SearchGate site={site} conn={conn} />
       </>
     );
@@ -52,7 +52,6 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
     <>
       <SeoHeader
         title="Search pages"
-        site={site}
         conn={conn}
         range={range}
         compare={view.compare}
@@ -95,7 +94,6 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
               </>
             }
             pairsTitle="Queries this page appeared for"
-            pairsNote="From the top query and page pairs stored per day. Anonymized queries are missing here, so the list can add up to less than the page's totals"
             pairs={detail[1]}
             pairHref={(key) => `${base}/seo/queries?${new URLSearchParams({ ...propertyQuery, query: key })}`}
           />
@@ -103,7 +101,6 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
         <Panel className="sk-enter">
           <PanelHeader
             title={`${formatNumber(table.total)} ${table.total === 1 ? "page" : "pages"}`}
-            description="Pages that appeared in Google Search, counted per page. Page figures and property totals are separate requests and are not interchangeable"
             meta={<Provenance source="gsc" detail={through} />}
           />
           <TableSearch pathname={pathname} params={sp} q={q} label="Search page URLs" />

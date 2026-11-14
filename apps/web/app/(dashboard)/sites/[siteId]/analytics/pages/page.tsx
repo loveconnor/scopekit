@@ -1,11 +1,10 @@
 import { addFilterHref, FilterChips } from "@/components/scopekit/filter-chips";
 import { MetricLabel } from "@/components/scopekit/kpi";
 import { Panel, PanelEmpty, PanelHeader } from "@/components/scopekit/panel";
-import { Provenance } from "@/components/scopekit/provenance";
 import { RawEventsNote, ReportFallback, SiteReportHeader } from "@/components/scopekit/site-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatDayRange, formatNumber } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import { viewQuery, withParams, type SearchParams } from "@/lib/params";
 import { loadSiteView } from "@/lib/site-view";
 import { pagesReport } from "@/lib/tables";
@@ -36,7 +35,6 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
     cursor: typeof sp.cursor === "string" ? sp.cursor : undefined,
   });
   const { range } = report;
-  const rangeLabel = range.preset === "24h" ? "Last 24 hours" : formatDayRange(range.from, range.to);
   const columns = COLUMNS.filter((column) => !(report.fromRawEvents && column.rollupOnly));
   const exportQuery = new URLSearchParams(viewQuery(sp).slice(1));
   exportQuery.set("format", "csv");
@@ -46,9 +44,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
     <>
       <SiteReportHeader
         title="Pages"
-        site={site}
         range={range}
-        rangeLabel={rangeLabel}
         compare={view.compare}
         actions={
           <Button variant="outline" size="sm" render={<a href={`/api/sites/${site.id}/analytics/pages?${exportQuery}`} download />}>
@@ -61,8 +57,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
       <Panel className="sk-enter">
         <PanelHeader
           title={report.total === null ? "Pages" : `${formatNumber(report.total)} ${report.total === 1 ? "page" : "pages"}`}
-          description="Paths are normalized: tracking parameters and trailing slashes are removed"
-          meta={<Provenance source="scopekit" detail={report.fromRawEvents ? "raw events" : "daily rollups"} />}
+          
         />
         {!report.fromRawEvents ? (
           <form action={pathname} className="flex items-center gap-2 px-5 pb-3">

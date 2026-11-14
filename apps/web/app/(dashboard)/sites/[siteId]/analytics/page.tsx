@@ -2,7 +2,6 @@ import { BarList } from "@/components/scopekit/bar-list";
 import { addFilterHref, FilterChips, filterValueLabel } from "@/components/scopekit/filter-chips";
 import { Kpi, KpiRow, MetricLabel } from "@/components/scopekit/kpi";
 import { Panel, PanelBody, PanelEmpty, PanelHeader } from "@/components/scopekit/panel";
-import { Provenance } from "@/components/scopekit/provenance";
 import { RawEventsNote, ReportFallback, SiteReportHeader } from "@/components/scopekit/site-header";
 import { change, reportLabels, trendRows } from "@/components/scopekit/site-report";
 import { TrendChart } from "@/components/scopekit/trend-chart";
@@ -28,7 +27,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
   ]);
   const { totals, previous, range, meta } = report;
   const annotations = await listAnnotations(getDb(), site.id, { from: range.from, to: range.to }, 8);
-  const { rangeLabel, comparedTo, through, hourly } = reportLabels(report, site.timezone);
+  const { rangeLabel, comparedTo, hourly } = reportLabels(report, site.timezone);
   const compared = view.compare ? comparedTo : undefined;
   const sessionReason = "Needs whole sessions; remove filters or use a daily range";
 
@@ -40,7 +39,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
 
   return (
     <>
-      <SiteReportHeader title="Traffic" site={site} range={range} rangeLabel={rangeLabel} compare={view.compare} />
+      <SiteReportHeader title="Traffic" range={range} compare={view.compare} />
       <FilterChips pathname={pathname} params={sp} view={view} />
       <div className="sk-enter flex flex-col gap-4">
         <KpiRow columns={6}>
@@ -51,16 +50,16 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
             change={view.compare ? change(totals.visitors, previous?.visitors) : undefined}
             comparedTo={compared}
             source="scopekit"
-            sourceDetail={meta.mixedVisitorModes ? "privacy mode changed in range" : "estimated per day"}
+            sourceDetail={meta.mixedVisitorModes ? "privacy mode changed in range" : null}
           />
-          <Kpi label={<MetricLabel metric="pageviews" />} value={totals.pageviews} change={view.compare ? change(totals.pageviews, previous?.pageviews) : undefined} comparedTo={compared} source="scopekit" sourceDetail={through} />
-          <Kpi label={<MetricLabel metric="sessions" />} value={totals.sessions} change={view.compare ? change(totals.sessions, previous?.sessions) : undefined} comparedTo={compared} source="scopekit" sourceDetail={through} />
+          <Kpi label={<MetricLabel metric="pageviews" />} value={totals.pageviews} change={view.compare ? change(totals.pageviews, previous?.pageviews) : undefined} comparedTo={compared} source="scopekit" />
+          <Kpi label={<MetricLabel metric="sessions" />} value={totals.sessions} change={view.compare ? change(totals.sessions, previous?.sessions) : undefined} comparedTo={compared} source="scopekit" />
           <Kpi
             label={<MetricLabel metric="pagesPerSession" />}
             value={totals.sessions ? formatRatio(totals.pageviews, totals.sessions) : null}
             unavailable={{ text: "No sessions", reason: "Nothing to divide by in this range" }}
             source="scopekit"
-            sourceDetail="pageviews / sessions"
+            
           />
           <Kpi
             label={<MetricLabel metric="engagedSessions" />}
@@ -76,14 +75,14 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
             value={report.sessionMetricsAvailable && totals.sessions ? formatPercent(totals.convertingSessions / totals.sessions) : null}
             unavailable={{ text: "Not available", reason: totals.sessions ? sessionReason : "No sessions in this range" }}
             source="scopekit"
-            sourceDetail="converting / all sessions"
+            
           />
         </KpiRow>
 
         <Panel>
           <PanelHeader
             title={hourly ? "Traffic by hour" : "Traffic by day"}
-            meta={<Provenance source="scopekit" detail={through} />}
+            
           />
           <div className="pb-4">
             <TrendChart
@@ -95,8 +94,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
           </div>
           {annotations.length ? (
             <div className="border-t border-line px-5 py-3">
-              <p className="text-[12px] leading-4 text-ink-3">Changes noted in this range. They mark dates; they are not shown as causes</p>
-              <ul className="mt-1 flex flex-wrap gap-x-5 gap-y-1">
+              <ul className="flex flex-wrap gap-x-5 gap-y-1">
                 {[...annotations].reverse().map((a) => (
                   <li key={a.id} className="text-[12px] leading-5 text-ink-2">
                     <span className="font-mono text-[11px] text-ink-3">{formatDay(a.date)}</span> {a.title}
@@ -115,7 +113,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
         <div className="grid gap-4 lg:grid-cols-3">
           {breakdowns.map((breakdown) => (
             <Panel key={breakdown.dimension}>
-              <PanelHeader title={breakdown.title} description="Pageviews. Select a row to filter" />
+              <PanelHeader title={breakdown.title} />
               {breakdown.rows.length ? (
                 <PanelBody>
                   <BarList

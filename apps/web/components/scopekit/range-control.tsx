@@ -87,16 +87,16 @@ export function RangeControl({
           </ToggleGroupItem>
         ))}
       </ToggleGroup>
-      <div className="w-[232px] [&_[data-slot=date-range-picker-trigger]]:h-8 [&_button]:h-8">
-      <DateRangePicker
-        aria-label="Custom date range"
-        value={{ from: fromIso(from), to: fromIso(to) }}
-        maxDate={maxDate ? fromIso(maxDate) : new Date()}
-        numberOfMonths={2}
-        onValueChange={(range) => {
-          if (range?.from && range.to) push({ range: "custom", from: toIso(range.from), to: toIso(range.to) });
-        }}
-      />
+      <div className="min-w-0 flex-1 basis-[220px] sm:w-[268px] sm:flex-none sm:basis-auto [&_[data-slot=date-range-trigger]]:h-8 [&_[data-slot=date-range-trigger]]:min-h-8">
+        <DateRangePicker
+          aria-label="Custom date range"
+          value={{ from: fromIso(from), to: fromIso(to) }}
+          maxDate={maxDate ? fromIso(maxDate) : new Date()}
+          numberOfMonths={2}
+          onValueChange={(range) => {
+            if (range?.from && range.to) push({ range: "custom", from: toIso(range.from), to: toIso(range.to) });
+          }}
+        />
       </div>
       <label htmlFor={compareId} className="flex h-8 cursor-pointer items-center gap-2 pl-1 text-[13px] text-ink-2">
         <Switch id={compareId} checked={compare} onCheckedChange={(checked) => push({ compare: checked ? null : "0" })} />

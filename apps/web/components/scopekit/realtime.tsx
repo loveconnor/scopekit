@@ -75,7 +75,7 @@ export function Realtime({ siteId }: { siteId: string }) {
           <p className="tnum mt-2 text-[36px] leading-10 font-medium text-ink" aria-live="polite">
             {data ? formatNumber(data.activeSessions) : "–"}
           </p>
-          <p className="mt-1 text-[12px] leading-4 text-ink-3">In the last 5 minutes. Approximate, not a count of people</p>
+          <p className="mt-1 text-[12px] leading-4 text-ink-3">Last 5 minutes</p>
           <Provenance source="scopekit" detail={freshness} className="mt-auto pt-4" />
         </Panel>
         <Panel className="xl:col-span-2">
@@ -84,8 +84,8 @@ export function Realtime({ siteId }: { siteId: string }) {
             {data ? (
               <BarChart data={minutes} config={config} xDataKey="minute" className="h-full w-full" animation={false} barRadius={2} ariaLabel="Accepted events per minute over the last 30 minutes">
                 <BarChart.Grid />
-                <BarChart.XAxis dataKey="minute" tickFormatter={(value, index) => (index % 5 === 4 ? value : "")} />
-                <BarChart.YAxis />
+                <BarChart.XAxis dataKey="minute" hideDots tickFormatter={(value, index) => (index % 5 === 4 ? value : "")} />
+                <BarChart.YAxis tickFormatter={(value) => (Number.isInteger(Number(value)) ? String(value) : "")} />
                 <BarChart.Tooltip />
                 <BarChart.Bar dataKey="events" />
               </BarChart>
@@ -95,7 +95,7 @@ export function Realtime({ siteId }: { siteId: string }) {
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
         <Panel>
-          <PanelHeader title="Pages right now" description="Pageviews in the last 30 minutes" />
+          <PanelHeader title="Pages right now" />
           {data?.topPages.length ? (
             <PanelBody>
               <BarList valueLabel="pageviews" items={data.topPages.map((p) => ({ key: p.path, label: <span className="font-mono text-[12px]">{p.path}</span>, value: p.pageviews, title: p.path }))} />
@@ -105,7 +105,7 @@ export function Realtime({ siteId }: { siteId: string }) {
           )}
         </Panel>
         <Panel>
-          <PanelHeader title="Sources right now" description="Sessions in the last 30 minutes" />
+          <PanelHeader title="Sources right now" />
           {data?.topSources.length ? (
             <PanelBody>
               <BarList valueLabel="sessions" items={data.topSources.map((s) => ({ key: `${s.source}/${s.medium}`, label: sourceLabel(s.source, s.medium), value: s.sessions }))} />

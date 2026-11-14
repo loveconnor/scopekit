@@ -12,7 +12,7 @@ async function Content({ params }: { params: Promise<{ siteId: string }> }) {
   const site = await loadSite(siteId);
   return (
     <>
-      <PageHeader title="Realtime" subtitle={`${site.name} · last 30 minutes · counts are approximate`} />
+      <PageHeader title="Realtime" subtitle="Last 30 minutes" />
       <Realtime siteId={site.id} />
     </>
   );

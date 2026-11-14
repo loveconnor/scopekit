@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { env } from "@/lib/env";
-import { formatDay, formatDayLong, formatDayRange, formatDateTime, formatNumber, formatRelative, type Change } from "@/lib/format";
+import { formatDay, formatDayLong, formatDateTime, formatNumber, formatRelative, type Change } from "@/lib/format";
 import { withParams, type SearchParams } from "@/lib/params";
 import { requestTime } from "@/lib/reports";
 import type { SearchConnection } from "@/lib/seo";
@@ -57,7 +57,6 @@ export function LinkTabs({ label, items }: { label: string; items: { href: strin
 
 export function SeoHeader({
   title,
-  site,
   conn,
   range,
   compare,
@@ -67,7 +66,6 @@ export function SeoHeader({
   showRange = true,
 }: {
   title: string;
-  site: SiteDetail;
   conn: SearchConnection;
   range: GscRange | null;
   compare: boolean;
@@ -83,16 +81,8 @@ export function SeoHeader({
         title={title}
         subtitle={
           <>
-            {site.name}
-            {range && showRange ? ` · ${formatDayRange(range.from, range.to)}` : ""}
-            {active ? (
-              <>
-                {" · "}
-                <span className="font-mono text-[12px]">{propertyLabel(active)}</span>
-                {" · Pacific Time days"}
-              </>
-            ) : null}
-            {active?.isDemo ? <span className="ml-2 font-mono text-[11px] text-warning">demo data</span> : null}
+            {active ? <span className="font-mono text-[12px]">{propertyLabel(active)}</span> : null}
+            {active?.isDemo ? <span className="ml-2 rounded-[4px] border border-line px-1 font-mono text-[11px] leading-4 text-ink-3">demo data</span> : null}
           </>
         }
         actions={

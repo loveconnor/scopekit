@@ -24,7 +24,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
   if (!isReady(conn) || !range) {
     return (
       <>
-        <SeoHeader title="Queries" site={site} conn={conn} range={null} compare={view.compare} params={sp} pathname={pathname} />
+        <SeoHeader title="Queries" conn={conn} range={null} compare={view.compare} params={sp} pathname={pathname} />
         <SearchGate site={site} conn={conn} />
       </>
     );
@@ -50,7 +50,6 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
     <>
       <SeoHeader
         title="Queries"
-        site={site}
         conn={conn}
         range={range}
         compare={view.compare}
@@ -82,7 +81,6 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
               )
             }
             pairsTitle="Pages this query led to"
-            pairsNote="From the top query and page pairs stored per day. Pairs are detail, so they can add up to less than the query's own totals"
             pairs={detail[1]}
             pairHref={(key) => `${base}/seo/pages?${new URLSearchParams({ ...(sp.property ? { property: property.id } : {}), page: key })}`}
             pairDisplay={pathOf}
@@ -91,15 +89,13 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
         <Panel className="sk-enter">
           <PanelHeader
             title={`${formatNumber(table.total)} ${table.total === 1 ? "query" : "queries"}`}
-            description="Search terms Google reports by name. Average position is not a live rank"
             meta={<Provenance source="gsc" detail={through} />}
           />
           <TableSearch pathname={pathname} params={sp} q={q} label="Search queries" />
           <SearchTable kind="query" rows={table.rows} sort={table.sort} page={table.page} pages={table.pages} compare={view.compare} pathname={pathname} params={sp} q={q} />
           {coverage.clickShare !== null ? (
             <p className="border-t border-line px-5 py-3 text-[12px] leading-4 text-ink-3">
-              These queries account for {formatNumber(coverage.clicks)} of {formatNumber(totals.clicks)} clicks ({formatPercent(coverage.clickShare, 0)}) in this range. Google withholds anonymized
-              queries and limits rows per day, so the long tail is incomplete. Missing queries are not estimated
+              Named queries: {formatNumber(coverage.clicks)} of {formatNumber(totals.clicks)} clicks ({formatPercent(coverage.clickShare, 0)})
             </p>
           ) : null}
         </Panel>

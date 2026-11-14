@@ -34,7 +34,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
   if (!isReady(conn) || !range) {
     return (
       <>
-        <SeoHeader title="Search performance" site={site} conn={conn} range={null} compare={view.compare} params={sp} pathname={pathname} />
+        <SeoHeader title="Search performance" conn={conn} range={null} compare={view.compare} params={sp} pathname={pathname} />
         <SearchGate site={site} conn={conn} />
       </>
     );
@@ -70,7 +70,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
 
   return (
     <>
-      <SeoHeader title="Search performance" site={site} conn={conn} range={range} compare={view.compare} params={sp} pathname={pathname} />
+      <SeoHeader title="Search performance" conn={conn} range={range} compare={view.compare} params={sp} pathname={pathname} />
       <ConnectionNotice site={site} conn={conn} />
       <div className="sk-enter flex flex-col gap-4">
         <KpiRow>
@@ -132,16 +132,16 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
               <TrendChart rows={rows} series={series} height={320} ariaLabel={`${METRICS[metric].label} per day for ${site.name}, ${formatDayRange(range.from, range.to)}, from Search Console`} />
             </div>
           ) : (
-            <PanelEmpty title="No search data in this range">Google reported no impressions for these days. That is different from data that has not been synced</PanelEmpty>
+            <PanelEmpty title="No search data in this range" />
           )}
           {range.clamped ? (
             <p className="border-t border-line px-5 py-3 text-[12px] leading-4 text-ink-3">
-              The range ends on {formatDayLong(range.to)}, the newest day Google has finalized. Later days are left out until they are final
+              Ends {formatDayLong(range.to)}, the newest finalized day
             </p>
           ) : null}
         </Panel>
 
-        <div className="grid gap-4 xl:grid-cols-2">
+        <div className="grid items-start gap-4 xl:grid-cols-2">
           {(
             [
               { kind: "query", title: "Top queries", href: `${base}/seo/queries${keep}`, all: "All queries", table: queries },
@@ -185,20 +185,20 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
                   </table>
                 </div>
               ) : (
-                <PanelEmpty title={`No ${block.kind === "query" ? "queries" : "pages"} stored for this range`}>Detail fills in as the backfill reaches these days</PanelEmpty>
+                <PanelEmpty title={`No ${block.kind === "query" ? "queries" : "pages"} stored for this range`} />
               )}
               {block.kind === "query" && coverage.clickShare !== null && coverage.queries > 0 ? (
                 <p className="border-t border-line px-5 py-3 text-[12px] leading-4 text-ink-3">
-                  Queries shown by name account for {formatPercent(coverage.clickShare, 0)} of clicks in this range. Google withholds the rest as anonymized queries; they are not estimated
+                  Named queries: {formatPercent(coverage.clickShare, 0)} of clicks
                 </p>
               ) : null}
             </Panel>
           ))}
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="grid items-start gap-4 lg:grid-cols-2">
           <Panel>
-            <PanelHeader title="Devices" description="Clicks by device class" />
+            <PanelHeader title="Devices" />
             {devices.length ? (
               <PanelBody>
                 <BarList valueLabel="clicks" items={devices.map((row) => ({ key: row.value, label: deviceLabel(row.value), value: row.clicks }))} />
@@ -208,7 +208,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
             )}
           </Panel>
           <Panel>
-            <PanelHeader title="Countries" description="Clicks by searcher country" />
+            <PanelHeader title="Countries" />
             {countries.length ? (
               <PanelBody>
                 <BarList

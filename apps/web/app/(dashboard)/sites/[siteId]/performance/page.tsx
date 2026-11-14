@@ -73,8 +73,8 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
       title="Performance"
       subtitle={
         <>
-          {site.name} · <span className="font-mono text-[12px]">{pathOfUrl(url)}</span>
-          {site.isDemo ? <span className="ml-2 font-mono text-[11px] text-warning">demo data</span> : null}
+          <span className="font-mono text-[12px]">{pathOfUrl(url)}</span>
+          {site.isDemo ? <span className="ml-2 rounded-[4px] border border-line px-1 font-mono text-[11px] leading-4 text-ink-3">demo data</span> : null}
         </>
       }
       actions={
@@ -160,13 +160,13 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
               ))}
             </KpiRow>
             <Panel>
-              <PanelHeader title="Performance score by run" description="Scores move a few points between identical runs. Two runs in a row are compared before anything counts as a regression" meta={<Provenance source="lighthouse" detail={`${formatNumber(done.length)} ${done.length === 1 ? "run" : "runs"}`} />} />
+              <PanelHeader title="Performance score by run" meta={<Provenance source="lighthouse" detail={`${formatNumber(done.length)} ${done.length === 1 ? "run" : "runs"}`} />} />
               {labRows.length > 1 ? (
                 <div className="pb-4">
                   <TrendChart rows={labRows} series={[{ key: "performance", label: "Performance score", ...INK, emphasis: true }]} height={280} ariaLabel={`Lighthouse performance score per run for ${pathOfUrl(url)} on ${device}`} />
                 </div>
               ) : (
-                <PanelEmpty title="One run so far">A trend needs at least two runs. The homepage is checked daily from now on</PanelEmpty>
+                <PanelEmpty title="One run so far" />
               )}
               <dl className="grid grid-cols-2 gap-x-6 gap-y-3 border-t border-line px-5 py-4 sm:grid-cols-5">
                 {[
@@ -184,7 +184,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
               </dl>
             </Panel>
             <Panel>
-              <PanelHeader title="Recommendations from the latest run" description="Only items Lighthouse attached an estimated saving to. The estimates are Lighthouse's own" />
+              <PanelHeader title="Recommendations from the latest run" />
               {latest.opportunities?.length ? (
                 <ul className="px-5 pb-3">
                   {latest.opportunities.map((o) => (
@@ -203,7 +203,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
           </>
         ) : (
           <Panel>
-            <PanelEmpty title="No lab run for this page and device yet">{disabledReason ?? "Start one with Run check. It measures mobile and desktop"}</PanelEmpty>
+            <PanelEmpty title="No lab run for this page and device yet">{disabledReason}</PanelEmpty>
           </Panel>
         )}
 
@@ -212,7 +212,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
           <p className="text-[13px] leading-5 text-ink-2">Chrome UX Report for the whole origin, 75th percentile over 28 days, {device === "mobile" ? "phones" : "desktops"} only</p>
         </div>
         {fieldLatest ? (
-          <Panel className="border-l-2 border-l-ink-3/40">
+          <Panel>
             <div className="grid divide-y divide-line border-b border-line sm:grid-cols-3 sm:divide-x sm:divide-y-0">
               {(Object.keys(FIELD) as CwvMetric[]).map((metric) => {
                 const value = fieldValue(metric);
@@ -260,12 +260,12 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
           <Panel className="border-l-2 border-l-ink-3/40">
             <PanelEmpty title={cruxState === "no_data" ? "Chrome has no field data for this origin" : cruxState === "error" ? "Field data could not be fetched" : "Field data has not been imported yet"}>
               {cruxState === "no_data"
-                ? "Too few Chrome users visited it for Google to publish values. That is common for smaller sites, and it is not a zero"
+                ? "Too few Chrome users for Google to publish values"
                 : cruxState === "error"
-                  ? "The Chrome UX Report did not answer. It is tried again with the next weekly import"
+                  ? "Retried with the next weekly import"
                   : configured
-                    ? "It is imported within the hour after the first lab run, then weekly"
-                    : "It needs GOOGLE_API_KEY, like lab runs"}
+                    ? "Imported after the first lab run, then weekly"
+                    : "Requires GOOGLE_API_KEY"}
             </PanelEmpty>
             <Provenance source="crux" detail={cruxState === "no_data" ? "not eligible" : "not imported"} className="px-5 pb-4" />
           </Panel>
@@ -273,7 +273,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
 
         {site.isDemo ? null : (
           <Panel>
-            <PanelHeader title="Pages checked weekly" description={`Besides the homepage, which is checked daily. Up to 10 pages, one URL per line. ${formatNumber(usedToday)} of ${PERFORMANCE_DAILY_CAP} runs used in the last 24 hours`} />
+            <PanelHeader title="Pages checked weekly" description={`One URL per line, up to 10 · ${formatNumber(usedToday)} of ${PERFORMANCE_DAILY_CAP} runs used today`} />
             <PanelBody>
               <PerformanceUrlsForm siteId={site.id} urls={site.settings.performanceUrls} origin={site.canonicalOrigin} />
             </PanelBody>

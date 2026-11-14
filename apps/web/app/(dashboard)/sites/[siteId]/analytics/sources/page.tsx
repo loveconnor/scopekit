@@ -1,10 +1,9 @@
 import { addFilterHref, FilterChips } from "@/components/scopekit/filter-chips";
 import { MetricLabel } from "@/components/scopekit/kpi";
 import { Panel, PanelEmpty, PanelHeader } from "@/components/scopekit/panel";
-import { Provenance } from "@/components/scopekit/provenance";
 import { RawEventsNote, ReportFallback, SiteReportHeader } from "@/components/scopekit/site-header";
 import { Button } from "@/components/ui/button";
-import { formatDayRange, formatNumber, formatPercent } from "@/lib/format";
+import { formatNumber, formatPercent } from "@/lib/format";
 import { viewQuery, withParams, type SearchParams } from "@/lib/params";
 import { loadSiteView } from "@/lib/site-view";
 import { sourcesReport } from "@/lib/tables";
@@ -30,7 +29,6 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
   const group = GROUPS.find((g) => g.key === sp.group) ?? GROUPS[0]!;
   const report = await sourcesReport(site, view, group.key);
   const { range } = report;
-  const rangeLabel = range.preset === "24h" ? "Last 24 hours" : formatDayRange(range.from, range.to);
   const exportQuery = new URLSearchParams(viewQuery(sp).slice(1));
   exportQuery.set("format", "csv");
   exportQuery.set("group", group.key);
@@ -41,9 +39,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
     <>
       <SiteReportHeader
         title="Sources"
-        site={site}
         range={range}
-        rangeLabel={rangeLabel}
         compare={view.compare}
         actions={
           <Button variant="outline" size="sm" render={<a href={`/api/sites/${site.id}/analytics/sources?${exportQuery}`} download />}>
@@ -56,8 +52,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
       <Panel className="sk-enter">
         <PanelHeader
           title="Where sessions started"
-          description="A session keeps the source of its first event. Later in-site navigation is never re-attributed"
-          meta={<Provenance source="scopekit" detail="first touch per session" />}
+          
         />
         <nav aria-label="Group sources by" className="flex gap-1 px-5 pb-3">
           {GROUPS.map((g) => (
@@ -125,15 +120,11 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
         ) : (
           <PanelEmpty title={group.empty} />
         )}
-        <div className="border-t border-line px-5 py-3">
-          {report.fromRawEvents ? (
+        {report.fromRawEvents ? (
+          <div className="border-t border-line px-5 py-3">
             <RawEventsNote retentionDays={site.settings.retentionDays} truncated={false} filtered={view.hasFilters} />
-          ) : (
-            <p className="text-[12px] leading-4 text-ink-3">
-              Direct / unknown means no referrer or campaign was sent. It is not proof that someone typed the address
-            </p>
-          )}
-        </div>
+          </div>
+        ) : null}
       </Panel>
     </>
   );

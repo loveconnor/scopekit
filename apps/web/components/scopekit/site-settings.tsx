@@ -137,7 +137,7 @@ export function SiteSettings({ site, collectorUrl }: { site: SettingsSite; colle
 
   return (
     <div className="flex flex-col gap-4">
-      <Section title="General" description="Reports use this timezone for day boundaries">
+      <Section title="General">
         <form
           className="flex flex-col gap-5"
           onSubmit={(e) => {
@@ -159,7 +159,7 @@ export function SiteSettings({ site, collectorUrl }: { site: SettingsSite; colle
         </form>
       </Section>
 
-      <Section id="install" title="Install" description="One deferred script, about 2 KB gzipped. It never blocks rendering">
+      <Section id="install" title="Install">
         {site.isDemo ? (
           <p className="text-[13px] leading-5 text-ink-2">This is a synthetic demo site. The collector does not accept events for it</p>
         ) : snippet && collectorUrl ? (
@@ -173,7 +173,7 @@ export function SiteSettings({ site, collectorUrl }: { site: SettingsSite; colle
         )}
       </Section>
 
-      <Section title="Domains" description="Events are accepted only from pages on these hostnames. This limits accidental misuse; it does not authenticate browsers">
+      <Section title="Domains">
         <form
           className="flex flex-col gap-5"
           onSubmit={(e) => {
@@ -194,7 +194,7 @@ export function SiteSettings({ site, collectorUrl }: { site: SettingsSite; colle
         </form>
       </Section>
 
-      <Section title="Tracking and privacy" description="Sites remain responsible for their own notices and consent where the law requires them">
+      <Section title="Tracking and privacy">
         <form
           className="flex flex-col gap-5"
           onSubmit={(e) => {
@@ -244,7 +244,7 @@ export function SiteSettings({ site, collectorUrl }: { site: SettingsSite; colle
         </form>
       </Section>
 
-      <Section title="URL rules" description="How paths are grouped before they are stored">
+      <Section title="URL rules">
         <form
           className="flex flex-col gap-5"
           onSubmit={(e) => {
@@ -266,7 +266,7 @@ export function SiteSettings({ site, collectorUrl }: { site: SettingsSite; colle
         </form>
       </Section>
 
-      <Section title="Delete website" description="Collection stops at once. Events, daily totals and goals are then purged and cannot be recovered">
+      <Section title="Delete website" description="Stops collection and permanently deletes its events, totals and goals">
         <Dialog onOpenChange={() => setConfirmText("")}>
           <DialogTrigger render={<Button variant="destructive-outline" size="sm" className="self-start" />}>Delete website</DialogTrigger>
           <DialogPopup className="w-[440px] max-w-[calc(100vw-32px)]">

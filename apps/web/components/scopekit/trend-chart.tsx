@@ -38,7 +38,6 @@ export function TrendChart({
     () => Object.fromEntries(series.map((s) => [s.key, { label: s.label, colors: { light: [s.light], dark: [s.dark] } }])) satisfies ChartConfig,
     [series],
   );
-  const everyNth = Math.max(1, Math.ceil(rows.length / 8));
 
   return (
     <div>
@@ -83,7 +82,8 @@ export function TrendChart({
             dataStatusText={STATUS_TEXT}
           >
             <LineChart.Grid />
-            <LineChart.XAxis dataKey="label" tickFormatter={(value, index) => (index % everyNth === 0 ? value : "")} />
+            {/* Labels thin themselves to the width available, so a phone shows fewer dates rather than none. */}
+            <LineChart.XAxis dataKey="label" hideDots />
             <LineChart.YAxis tickFormatter={(value) => formatCompact(value)} />
             <LineChart.Tooltip />
             {series.map((s) => (

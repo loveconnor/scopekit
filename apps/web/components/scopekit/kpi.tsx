@@ -57,10 +57,9 @@ export function Kpi({ label, value, unavailable, change, delta, comparedTo, note
     <Panel className="flex min-h-[136px] flex-col p-5">
       <div className="text-[13px] leading-5 text-ink-2">{label}</div>
       {value === null && unavailable ? (
-        <>
-          <p className="mt-2 text-[16px] leading-8 font-medium text-ink-2">{unavailable.text}</p>
-          <p className="text-[12px] leading-4 text-ink-3">{unavailable.reason}</p>
-        </>
+        <p className="mt-2 text-[16px] leading-8 font-medium text-ink-2" title={unavailable.reason}>
+          {unavailable.text}
+        </p>
       ) : (
         <>
           <p className="tnum mt-2 text-[28px] leading-8 font-medium text-ink">

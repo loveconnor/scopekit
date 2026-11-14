@@ -13,7 +13,7 @@ export function FirstRun() {
   return (
     <Panel className="mx-auto mt-10 max-w-[720px] p-8">
       <h2 className="text-[20px] leading-7 font-medium text-ink">Add your first website</h2>
-      <p className="mt-1 max-w-[56ch] text-[14px] leading-5 text-ink-2">
+      <p className="mt-1 max-w-[56ch] text-[13px] leading-5 text-ink-2">
         ScopeKit starts measuring from the moment its snippet is installed. Nothing is shown until real events arrive
       </p>
       <ol className="mt-8 flex flex-col gap-5">
@@ -23,7 +23,7 @@ export function FirstRun() {
               {index + 1}
             </span>
             <span>
-              <span className="block text-[14px] leading-6 font-medium text-ink">{step.title}</span>
+              <span className="block text-[15px] leading-6 font-medium text-ink">{step.title}</span>
               <span className="block text-[13px] leading-5 text-ink-2">{step.body}</span>
             </span>
           </li>

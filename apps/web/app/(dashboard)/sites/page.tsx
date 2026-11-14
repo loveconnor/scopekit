@@ -42,7 +42,7 @@ async function SitesContent() {
     };
   });
   return (
-    <Panel className="sk-enter pt-4">
+    <Panel className="sk-enter overflow-hidden">
       <SitesTable rows={rows} />
     </Panel>
   );
@@ -53,7 +53,7 @@ export default function SitesPage() {
     <>
       <PageHeader
         title="Websites"
-        subtitle="Last 30 complete days, each site in its own timezone"
+        subtitle="Last 30 days"
         actions={
           <Button size="sm" render={<Link href="/sites/new" />}>
             Add website

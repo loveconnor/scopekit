@@ -17,7 +17,6 @@ export function SubjectDetail({
   closeHref,
   actions,
   pairsTitle,
-  pairsNote,
   pairs,
   pairHref,
   pairDisplay,
@@ -30,7 +29,6 @@ export function SubjectDetail({
   closeHref: string;
   actions?: ReactNode;
   pairsTitle: string;
-  pairsNote: string;
   pairs: GscPairRow[];
   pairHref: (key: string) => string;
   pairDisplay?: (key: string) => string;
@@ -90,7 +88,6 @@ export function SubjectDetail({
       ) : (
         <PanelEmpty title="No pairs stored for this range" />
       )}
-      <p className="border-t border-line px-5 py-3 text-[12px] leading-4 text-ink-3">{pairsNote}</p>
     </Panel>
   );
 }

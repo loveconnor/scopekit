@@ -33,7 +33,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
   if (!isReady(conn)) {
     return (
       <>
-        <SeoHeader title="Indexing" site={site} conn={conn} range={null} compare={view.compare} params={sp} pathname={pathname} />
+        <SeoHeader title="Indexing" conn={conn} range={null} compare={view.compare} params={sp} pathname={pathname} />
         <SearchGate site={site} conn={conn} />
       </>
     );
@@ -55,13 +55,12 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
 
   return (
     <>
-      <SeoHeader title="Indexing" site={site} conn={conn} range={null} compare={false} params={sp} pathname={pathname} showRange={false} />
+      <SeoHeader title="Indexing" conn={conn} range={null} compare={false} params={sp} pathname={pathname} showRange={false} />
       <ConnectionNotice site={site} conn={conn} />
       <div className="sk-enter flex flex-col gap-4">
         <Panel>
           <PanelHeader
             title="Check a URL"
-            description="For the pages you care about. There is no request-indexing button: Google only offers that API for job postings and livestreams"
             meta={<span className="tnum font-mono text-[11px] leading-4 text-ink-3">{formatNumber(usedToday)} of {formatNumber(INSPECTION_DAILY_CAP)} checks today</span>}
           />
           <PanelBody>
@@ -72,7 +71,6 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
         <Panel>
           <PanelHeader
             title={`${formatNumber(inspections.length)} checked ${inspections.length === 1 ? "URL" : "URLs"}`}
-            description="Google's indexed version at the time of each check, not a live test of the page"
             meta={<Provenance source="gsc" detail="URL Inspection" />}
           />
           {inspections.length ? (

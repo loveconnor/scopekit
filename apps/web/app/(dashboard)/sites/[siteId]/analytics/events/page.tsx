@@ -2,9 +2,8 @@ import { GoalsManager, type GoalRow } from "@/components/scopekit/goals-manager"
 import { CodeBlock } from "@/components/scopekit/install";
 import { MetricLabel } from "@/components/scopekit/kpi";
 import { Panel, PanelBody, PanelEmpty, PanelHeader } from "@/components/scopekit/panel";
-import { Provenance } from "@/components/scopekit/provenance";
 import { ReportFallback, SiteReportHeader } from "@/components/scopekit/site-header";
-import { formatDayRange, formatNumber } from "@/lib/format";
+import { formatNumber } from "@/lib/format";
 import { withParams, type SearchParams } from "@/lib/params";
 import { rangeFor } from "@/lib/reports";
 import { loadSiteView } from "@/lib/site-view";
@@ -38,23 +37,21 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
     completions: byGoal.get(goal.id)?.completions ?? 0,
     convertingSessions: byGoal.get(goal.id)?.convertingSessions ?? 0,
   }));
-  const rangeLabel = range.preset === "today" ? "Today" : formatDayRange(range.from, range.to);
   const sampleKeys = [...new Set(sample.map((row) => row.key))];
 
   return (
     <>
-      <SiteReportHeader title="Events and goals" site={site} range={range} rangeLabel={rangeLabel} compare={view.compare} allowHourly={false} />
+      <SiteReportHeader title="Events and goals" range={range} compare={view.compare} allowHourly={false} />
       <div className="sk-enter flex flex-col gap-4">
         <Panel>
           <GoalsManager siteId={site.id} goals={goalRows} sessions={totals.sessions} retentionDays={site.settings.retentionDays} />
         </Panel>
 
-        <div className="grid gap-4 xl:grid-cols-3">
+        <div className="grid grid-cols-1 items-start gap-4 xl:grid-cols-3">
           <Panel className="xl:col-span-2">
             <PanelHeader
               title="Event catalog"
-              description="Custom events, outbound clicks and downloads. Select one to inspect its properties"
-              meta={<Provenance source="scopekit" detail="daily rollups" />}
+              
             />
             {events.length ? (
               <div className="overflow-x-auto">
@@ -91,7 +88,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
               </div>
             ) : (
               <PanelEmpty title="No events in this range">
-                Events are sent from your own code with <span className="font-mono text-[12px]">scopekit.track()</span>. Pageviews are counted separately
+                Send them with <span className="font-mono text-[12px]">scopekit.track()</span>
               </PanelEmpty>
             )}
           </Panel>
@@ -125,7 +122,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
               </>
             ) : (
               <>
-                <PanelHeader title="Send an event" description="Call this from your own code. Flat, non-identifying values only" />
+                <PanelHeader title="Send an event" description="Flat, non-identifying values only" />
                 <PanelBody>
                   <CodeBlock label="JavaScript" code={`window.scopekit?.track("signup_completed", {\n  plan: "free",\n  source: "hero"\n});`} />
                 </PanelBody>

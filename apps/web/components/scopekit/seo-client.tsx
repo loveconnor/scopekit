@@ -156,7 +156,7 @@ export function PropertyPicker({ siteId, integrationId, siteHostname, properties
             {property.linked ? (
               <span className="text-[13px] text-ink-2">Linked</span>
             ) : !property.readable ? (
-              <span className="max-w-[260px] text-right text-[12px] leading-4 text-ink-3">Not verified for this account, so Google returns no data</span>
+              <span className="max-w-[260px] text-right text-[12px] leading-4 text-ink-3">Not verified for this account</span>
             ) : confirming === property.id ? (
               <span className="flex flex-wrap items-center justify-end gap-2">
                 <span className="text-[12px] leading-4 text-ink-2">Its hostname differs from {siteHostname}</span>

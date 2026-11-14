@@ -1,7 +1,6 @@
 import { AlertActions } from "@/components/scopekit/health-client";
 import { PageHeader } from "@/components/scopekit/page-header";
 import { Panel, PanelEmpty, PanelHeader, PanelSkeleton } from "@/components/scopekit/panel";
-import { Provenance } from "@/components/scopekit/provenance";
 import { LinkTabs } from "@/components/scopekit/seo";
 import { formatNumber, formatRelative } from "@/lib/format";
 import { ruleTitle } from "@/lib/health";
@@ -60,8 +59,7 @@ async function Content({ searchParams }: { searchParams: Promise<SearchParams> }
   return (
     <div className="sk-enter flex flex-col gap-4">
       <Panel>
-        <PanelHeader title={`${formatNumber(counts[status])} ${STATUS_LABELS[status].toLowerCase()}`} description="Each alert is raised once for its event, with the figures it was raised from" meta={<Provenance source="scopekit" detail="checked hourly" />} />
-        <div className="px-5 pb-3">
+        <div className="px-5 pt-4 pb-3">
           <LinkTabs
             label="Status"
             items={ALERT_STATUSES.map((s) => ({
@@ -88,7 +86,7 @@ async function Content({ searchParams }: { searchParams: Promise<SearchParams> }
                       <span className="text-ink-2">{alert.severity === "critical" ? "Critical" : "Warning"}</span>
                       <span>· {ALERT_LABELS[alert.type].label}</span>
                       <span>· {site?.name ?? "Deleted site"}</span>
-                      {site?.isDemo ? <span className="font-mono text-[11px] text-warning">demo</span> : null}
+                      {site?.isDemo ? <span className="rounded-[4px] border border-line px-1 font-mono text-[11px] leading-4 text-ink-3">demo</span> : null}
                     </p>
                     <Link href={hrefFor(alert)} className="mt-1 block rounded-sm text-[15px] leading-6 font-medium text-ink">
                       {alert.headline}
@@ -107,13 +105,11 @@ async function Content({ searchParams }: { searchParams: Promise<SearchParams> }
             })}
           </ul>
         ) : (
-          <PanelEmpty title={status === "open" ? "No open alerts" : `No ${STATUS_LABELS[status].toLowerCase()} alerts`}>
-            {status === "open" ? "Nothing crossed a rule's threshold. Sites with no data are not treated as having zero traffic" : "Alerts move here when you change their status"}
-          </PanelEmpty>
+          <PanelEmpty title={status === "open" ? "No open alerts" : `No ${STATUS_LABELS[status].toLowerCase()} alerts`} />
         )}
       </Panel>
       <Panel>
-        <PanelHeader title="What raises an alert" description="Switch a rule on or off, and choose email, per site under Site settings" />
+        <PanelHeader title="What raises an alert" />
         <ul className="px-5 pb-4">
           {ALERT_TYPES.map((type) => (
             <li key={type} className="flex flex-col border-b border-line py-2 last:border-0">
@@ -130,7 +126,7 @@ async function Content({ searchParams }: { searchParams: Promise<SearchParams> }
 export default function AlertsPage({ searchParams }: PageProps<"/alerts">) {
   return (
     <>
-      <PageHeader title="Alerts" subtitle="Changes that crossed a threshold, across all websites" />
+      <PageHeader title="Alerts" />
       <Suspense fallback={<PanelSkeleton height={240} />}>
         <Content searchParams={searchParams} />
       </Suspense>

@@ -27,8 +27,6 @@ import { ExternalLink } from "honestui/icons";
 import Link from "next/link";
 import { Suspense } from "react";
 
-const PRIVACY_LABELS = { default: "Privacy-first", strict: "Strict", consent: "Consent-based" } as const;
-
 async function Content({ params, searchParams }: { params: Promise<{ siteId: string }>; searchParams: Promise<SearchParams> }) {
   const { site, params: sp, view, base } = await loadSiteView(params, searchParams);
   const now = requestTime();
@@ -49,8 +47,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
       </a>
       <StatusBadge status={status} />
       <span className="text-[13px] text-ink-2">Last event {formatRelative(site.lastEventAt, now).toLowerCase()}</span>
-      <span className="text-[13px] text-ink-2">{PRIVACY_LABELS[site.privacyMode]} tracking</span>
-      {site.isDemo ? <span className="font-mono text-[11px] text-warning">demo data</span> : null}
+      {site.isDemo ? <span className="rounded-[4px] border border-line px-1 font-mono text-[11px] leading-4 text-ink-3">demo data</span> : null}
     </div>
   );
 
@@ -87,7 +84,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
     listAuditLogs(getDb(), { siteId: site.id, limit: 5 }),
   ]);
   const { totals, previous, range } = report;
-  const { rangeLabel, comparedTo, through } = reportLabels(report, site.timezone);
+  const { rangeLabel, comparedTo } = reportLabels(report, site.timezone);
   const db = getDb();
   const [audit, topIssues, lab, fieldSeries, annotations, openAlerts] = await Promise.all([
     loadAuditState(site.id),
@@ -120,7 +117,6 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
       : { text: "Not connected", reason: "No Search Console property is linked" };
   const searchCompared = view.compare && search ? `vs previous ${search.range.days} days` : undefined;
   const compared = view.compare ? comparedTo : undefined;
-  const visitorDetail = report.meta.visitorMode === "first-party-id" ? "first-party ID" : "estimated per day";
 
   return (
     <>
@@ -138,7 +134,6 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
             change={view.compare ? change(totals.visitors, previous?.visitors) : undefined}
             comparedTo={compared}
             source="scopekit"
-            sourceDetail={visitorDetail}
           />
           <Kpi
             label={<MetricLabel metric="pageviews" />}
@@ -146,7 +141,6 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
             change={view.compare ? change(totals.pageviews, previous?.pageviews) : undefined}
             comparedTo={compared}
             source="scopekit"
-            sourceDetail={through}
           />
           <Kpi
             label={<MetricLabel metric="sessions" />}
@@ -154,7 +148,6 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
             change={view.compare ? change(totals.sessions, previous?.sessions) : undefined}
             comparedTo={compared}
             source="scopekit"
-            sourceDetail={through}
           />
           <Kpi
             label={<MetricLabel metric="conversions" />}
@@ -163,7 +156,6 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
             change={view.compare && report.sessionMetricsAvailable ? change(totals.conversions, previous?.conversions) : undefined}
             comparedTo={compared}
             source="scopekit"
-            sourceDetail={through}
           />
           <Kpi
             label="Search clicks"
@@ -189,7 +181,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
           <Panel className="xl:col-span-2">
             <PanelHeader
               title="Traffic"
-              meta={<Provenance source="scopekit" detail={through} />}
+              
               action={
                 <Link href={`${base}/analytics${query}`} className="rounded-sm text-[13px] text-ink-2 underline decoration-line underline-offset-4 hover:text-ink">
                   Open traffic
@@ -205,7 +197,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
             </div>
           </Panel>
           <Panel>
-            <PanelHeader title="Top sources" description="Sessions by where they started" />
+            <PanelHeader title="Top sources" />
             {sources.rows.length ? (
               <PanelBody>
                 <BarList
@@ -226,7 +218,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
           </Panel>
         </div>
 
-        <div className="grid gap-4 xl:grid-cols-3">
+        <div className="grid items-start gap-4 xl:grid-cols-3">
           <Panel className="xl:col-span-2">
             <PanelHeader
               title="Top pages"
@@ -293,7 +285,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
                     </div>
                   </>
                 ) : (
-                  <PanelEmpty title="No queries in this range">Google reported no named queries for these days</PanelEmpty>
+                  <PanelEmpty title="No queries in this range" />
                 )
               ) : (
                 <PanelEmpty
@@ -306,7 +298,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
                     ) : undefined
                   }
                 >
-                  {hourly ? "Search data is daily and lags by days. Pick a daily range to see it" : conn.state === "waiting" ? "Search figures appear when it finishes" : "Search figures stay empty, not zero, until a property is linked"}
+                  {hourly ? "Search data is daily. Pick a daily range" : null}
                 </PanelEmpty>
               )}
             </Panel>
@@ -321,7 +313,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
                 }
               />
               {!audit.latestWithPages ? (
-                <PanelEmpty title="No audit yet">Run a crawl to check for broken pages, titles, canonicals and sitemap problems</PanelEmpty>
+                <PanelEmpty title="No audit yet" />
               ) : topIssues.length ? (
                 <ul className="px-5 pb-3">
                   {topIssues.map((issue) => (
@@ -337,7 +329,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
                   ))}
                 </ul>
               ) : (
-                <PanelEmpty title="No critical or high issues open">{audit.latestWithPages.coverageComplete ? "From the last complete crawl" : "The last crawl was partial, so this covers only the pages it visited"}</PanelEmpty>
+                <PanelEmpty title="No critical or high issues open">{audit.latestWithPages.coverageComplete ? null : "Last crawl was partial"}</PanelEmpty>
               )}
             </Panel>
             <Panel>
@@ -400,7 +392,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
                   ))}
                 </ul>
               ) : (
-                <PanelEmpty title="No changes recorded">Setting and goal changes for this site appear here</PanelEmpty>
+                <PanelEmpty title="No changes recorded" />
               )}
             </Panel>
           </div>

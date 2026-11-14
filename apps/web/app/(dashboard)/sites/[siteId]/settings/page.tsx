@@ -24,7 +24,7 @@ async function Content({ params }: { params: Promise<{ siteId: string }> }) {
   const alertRules = await listAlertRules(getDb(), site.id);
   return (
     <>
-      <PageHeader title="Site settings" subtitle={`${site.name} · ${site.primaryHostname}`} />
+      <PageHeader title="Site settings" />
       <Panel className="mb-4">
         <div className="grid gap-x-10 gap-y-4 p-6 lg:grid-cols-[240px_minmax(0,1fr)]">
           <div>
@@ -91,11 +91,11 @@ async function Content({ params }: { params: Promise<{ siteId: string }> }) {
 
 export default function SiteSettingsPage({ params }: PageProps<"/sites/[siteId]/settings">) {
   return (
-    <div className="mx-auto max-w-[960px]">
+    <div className="max-w-[960px]">
       <Suspense
         fallback={
           <>
-            <PageHeader title="Site settings" subtitle=" " />
+            <PageHeader title="Site settings" />
             <PanelSkeleton height={200} />
           </>
         }

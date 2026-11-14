@@ -1,23 +1,18 @@
 import type { ResolvedRange } from "@scopekit/analytics";
-import type { SiteDetail } from "@scopekit/db";
 import { PageHeader } from "./page-header";
 import { KpiSkeletonRow, PanelSkeleton } from "./panel";
 import { RangeControl } from "./range-control";
 
-/** Header for a site report: what it is, which site, which period, in which timezone. */
+/** Header for a site report: title and range controls. */
 export function SiteReportHeader({
   title,
-  site,
   range,
-  rangeLabel,
   compare,
   allowHourly = true,
   actions,
 }: {
   title: string;
-  site: SiteDetail;
   range: ResolvedRange;
-  rangeLabel: string;
   compare: boolean;
   allowHourly?: boolean;
   actions?: React.ReactNode;
@@ -25,11 +20,6 @@ export function SiteReportHeader({
   return (
     <PageHeader
       title={title}
-      subtitle={
-        <>
-          {site.name} · {rangeLabel} · <span className="font-mono text-[12px]">{site.timezone}</span>
-        </>
-      }
       actions={
         <>
           <RangeControl preset={range.preset} from={range.from} to={range.to} compare={compare} allowHourly={allowHourly} />
@@ -43,7 +33,7 @@ export function SiteReportHeader({
 export function ReportFallback({ title, kpis = 4 }: { title: string; kpis?: number }) {
   return (
     <>
-      <PageHeader title={title} subtitle=" " />
+      <PageHeader title={title} />
       <div className="flex flex-col gap-4">
         {kpis ? <KpiSkeletonRow count={kpis} /> : null}
         <PanelSkeleton height={300} />

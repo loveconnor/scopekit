@@ -13,7 +13,7 @@
  * ----------------------------------------------------------------------- */
 
 :root {
-  --hui-font-love-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --hui-font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --hui-font-mono: var(--font-geist-mono), ui-monospace, Menlo, monospace;
 
   /* Spec: inputs and buttons 8px, cards 10px. Borders carry depth, not shadows. */
@@ -32,7 +32,7 @@
 }
 
 :root[data-theme="light"] {
-  --sk-canvas: #fbfbfb;
+  --sk-canvas: #f7f7f7;
   --sk-surface: #ffffff;
   --sk-muted-surface: #f3f3f3;
   --sk-border: #e8e8e8;
@@ -72,6 +72,21 @@
   --hui-danger-9: #c4413a;
   --hui-danger-10: #ad3832;
   --hui-danger-11: #a8352f;
+
+  /* One gray ramp: Honest UI's neutral steps sit on the ScopeKit grays, so
+   * overlays, field hovers, and raised fills match the cards and borders. */
+  --hui-gray-1: #fdfdfd;
+  --hui-gray-2: #f9f9f9;
+  --hui-gray-3: #f3f3f3;
+  --hui-gray-4: #ececec;
+  --hui-gray-5: #e5e5e5;
+  --hui-gray-6: #dcdcdc;
+  --hui-gray-7: #cecece;
+  --hui-gray-8: #b5b5b5;
+  --hui-gray-9: #8f8f8f;
+  --hui-gray-10: #6b6b6b;
+  --hui-gray-11: #525252;
+  --hui-gray-12: #0f0f0f;
 }
 
 :root[data-theme="dark"] {
@@ -85,9 +100,9 @@
   --sk-accent: #f5f5f5;
   --sk-accent-ink: #f5f5f5;
   --sk-on-accent: #0a0a0a;
-  --sk-negative: #ef8a83;
-  --sk-warning: #e0ac5c;
-  --sk-positive: #7fc79a;
+  --sk-negative: #f2726a;
+  --sk-warning: #e3a443;
+  --sk-positive: #4fbf86;
 
   --sk-series-1: #f5f5f5;
   --sk-series-2: #9a9a9a;
@@ -110,9 +125,22 @@
   --hui-accent-12: #f5f5f5;
   --hui-accent-contrast: #0a0a0a;
 
-  --hui-danger-9: #ef8a83;
-  --hui-danger-11: #ef8a83;
+  --hui-danger-9: #f2726a;
+  --hui-danger-11: #f2726a;
   --hui-danger-contrast: #0a0a0a;
+
+  --hui-gray-1: #161616;
+  --hui-gray-2: #1a1a1a;
+  --hui-gray-3: #1e1e1e;
+  --hui-gray-4: #262626;
+  --hui-gray-5: #2c2c2c;
+  --hui-gray-6: #333333;
+  --hui-gray-7: #3d3d3d;
+  --hui-gray-8: #4d4d4d;
+  --hui-gray-9: #6b6b6b;
+  --hui-gray-10: #8f8f8f;
+  --hui-gray-11: #b3b3b3;
+  --hui-gray-12: #f5f5f5;
 }
 
 
@@ -132,6 +160,11 @@
   --hui-color-foreground-base-tertiary: var(--sk-text-muted);
   --hui-color-border-base-primary: var(--sk-border);
   --hui-color-border-base-secondary: var(--sk-border);
+
+  /* 0.4.0: the default Button fills with neutral-emphasis. Keep it ScopeKit ink. */
+  --hui-color-background-neutral-emphasis: var(--sk-accent);
+  --hui-color-foreground-base-emphasis: var(--sk-on-accent);
+  --hui-color-border-danger-primary: color-mix(in oklch, var(--sk-negative) 45%, var(--sk-border));
 
   --background: var(--sk-canvas);
   --foreground: var(--sk-text);
@@ -198,6 +231,12 @@
 }
 
 @layer base {
+  /* honestui/charts.css is compiled Tailwind and sets system-font defaults for
+   * these on :root, inside base.theme. A rule directly in base outranks it. */
+  :root {
+    --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+    --font-mono: var(--font-geist-mono), ui-monospace, Menlo, monospace;
+  }
   * {
     border-color: var(--sk-border);
   }
@@ -214,7 +253,6 @@
     font-family: var(--font-sans);
     font-size: 14px;
     line-height: 20px;
-    font-feature-settings: "ss01", "cv11";
   }
   :focus-visible {
     outline: 2px solid var(--sk-accent);

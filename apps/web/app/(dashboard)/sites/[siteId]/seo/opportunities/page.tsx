@@ -50,7 +50,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
   if (!isReady(conn)) {
     return (
       <>
-        <SeoHeader title="Opportunities" site={site} conn={conn} range={null} compare={view.compare} params={sp} pathname={pathname} />
+        <SeoHeader title="Opportunities" conn={conn} range={null} compare={view.compare} params={sp} pathname={pathname} />
         <SearchGate site={site} conn={conn} />
       </>
     );
@@ -66,7 +66,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
 
   return (
     <>
-      <SeoHeader title="Opportunities" site={site} conn={conn} range={null} compare={false} params={sp} pathname={pathname} showRange={false} />
+      <SeoHeader title="Opportunities" conn={conn} range={null} compare={false} params={sp} pathname={pathname} showRange={false} />
       <ConnectionNotice site={site} conn={conn} />
       <div className="sk-enter flex flex-col gap-4">
         <Panel>
@@ -127,11 +127,11 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
             </ul>
           ) : unbuilt ? (
             <PanelEmpty title={`No ${CATEGORY_LABELS[category!].toLowerCase()} rules yet`}>
-              {category === "technical" ? "Technical opportunities need site audits, which are not built yet" : "Performance opportunities need Lighthouse and CrUX data, which are not built yet"}
+              Not built yet
             </PanelEmpty>
           ) : (
             <PanelEmpty title={status === "new" ? "Nothing new was found" : `Nothing is ${STATUS_LABELS[status].toLowerCase()}`}>
-              {status === "new" ? "No query or page crossed a rule's thresholds in the last 28 finalized days. Low-volume sites often have nothing here, and that is a real result" : "Items move here when you change their status"}
+              {status === "new" ? "Checked against the last 28 finalized days" : null}
             </PanelEmpty>
           )}
         </Panel>

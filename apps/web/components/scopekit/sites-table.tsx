@@ -56,7 +56,7 @@ export function SitesTable({ rows, showSearch = true }: { rows: SiteRow[]; showS
   return (
     <div>
       {showSearch && rows.length > 5 ? (
-        <div className="px-5 pb-3">
+        <div className="px-5 pb-3 [div:first-child>&]:pt-4">
           <Input
             size="sm"
             type="search"
@@ -68,10 +68,10 @@ export function SitesTable({ rows, showSearch = true }: { rows: SiteRow[]; showS
           />
         </div>
       ) : null}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto border-t border-line [div:first-child>&:first-child]:border-t-0">
         <table className="w-full min-w-[1040px] border-collapse text-[13px]">
           <thead>
-            <tr className="border-y border-line text-[12px] text-ink-3">
+            <tr className="border-b border-line text-[12px] text-ink-3">
               {COLUMNS.map((column) => {
                 const active = sort.key === column.key;
                 const Arrow = sort.dir === "asc" ? ArrowUp : ArrowDown;
@@ -117,7 +117,7 @@ export function SitesTable({ rows, showSearch = true }: { rows: SiteRow[]; showS
                   <Link href={`/sites/${row.id}/overview`} className="flex min-w-0 flex-col rounded-sm">
                     <span className="truncate font-medium text-ink">
                       {row.name}
-                      {row.isDemo ? <span className="ml-2 font-mono text-[11px] font-normal text-warning">demo</span> : null}
+                      {row.isDemo ? <span className="ml-2 rounded-[4px] border border-line px-1 font-mono text-[11px] leading-4 text-ink-3 font-normal">demo</span> : null}
                     </span>
                     <span className="truncate font-mono text-[11px] leading-4 text-ink-3">{row.hostname}</span>
                   </Link>

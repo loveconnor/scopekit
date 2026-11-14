@@ -29,30 +29,23 @@ async function Content() {
   return (
     <div className="sk-enter flex flex-col gap-4">
       <Panel>
-        <Row title="Appearance" description="Saved to your account and this browser">
+        <Row title="Appearance">
           <ThemeSetting initial={prefs.theme} />
         </Row>
-        <Row title="Default range" description="Used when a report link has no range of its own. Always complete days">
+        <Row title="Default range">
           <DefaultRangeSetting initial={prefs.defaultRange} />
         </Row>
-        <Row title="Account" description="Sign-in is limited to the allowlist in SCOPEKIT_ALLOWED_EMAILS">
+        <Row title="Account">
           <p className="font-mono text-[13px] leading-5 text-ink">{user.email}</p>
-          <p className="mt-1 text-[12px] leading-4 text-ink-3">
-            {env.github ? "GitHub and emailed sign-in links are enabled" : "Emailed sign-in links are enabled. No passwords are stored"}
-          </p>
         </Row>
-        <Row title="Collector" description="Where tracked sites send events">
+        <Row title="Collector">
           <p className="font-mono text-[13px] leading-5 text-ink">{env.collectorUrl || "NEXT_PUBLIC_COLLECTOR_URL is not set"}</p>
-          <p className="mt-1 text-[12px] leading-4 text-ink-3">
-            {env.demo ? "Demo mode is on: synthetic sites created by npm run demo:seed are visible" : "Demo mode is off"}
-          </p>
         </Row>
       </Panel>
 
       <Panel>
         <div className="px-6 pt-5 pb-2">
           <h2 className="text-[15px] leading-6 font-medium text-ink">Metric definitions</h2>
-          <p className="text-[13px] leading-5 text-ink-2">The same wording appears wherever a metric is shown</p>
         </div>
         <dl className="px-6 pb-4">
           {Object.entries(METRIC_DEFINITIONS).map(([key, def]) => (
@@ -60,7 +53,6 @@ async function Content() {
               <dt className="text-[13px] leading-5 text-ink">{def.label}</dt>
               <dd>
                 <span className="block text-[13px] leading-5 text-ink-2">{def.definition}</span>
-                <span className="block text-[12px] leading-4 text-ink-3">{def.caveat}</span>
               </dd>
             </div>
           ))}
@@ -72,8 +64,8 @@ async function Content() {
 
 export default function SettingsPage() {
   return (
-    <div className="mx-auto max-w-[960px]">
-      <PageHeader title="Settings" subtitle="Preferences for this account and how metrics are defined" />
+    <div className="max-w-[960px]">
+      <PageHeader title="Settings" />
       <Suspense fallback={<PanelSkeleton height={240} />}>
         <Content />
       </Suspense>

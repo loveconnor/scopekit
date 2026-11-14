@@ -47,14 +47,13 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
   const pathname = `/sites/${site.id}/audit`;
   const run = state.latestWithPages;
   const tab = one(sp.tab) === "pages" || one(sp.tab) === "settings" ? (one(sp.tab) as "pages" | "settings") : "issues";
-  const subtitle = `${site.name} · ${site.primaryHostname}`;
   const header = (
     <PageHeader
       title="Site audit"
       subtitle={
         <>
-          {subtitle}
-          {site.isDemo ? <span className="ml-2 font-mono text-[11px] text-warning">demo data</span> : null}
+          <span className="font-mono text-[12px]">{site.primaryHostname}</span>
+          {site.isDemo ? <span className="ml-2 rounded-[4px] border border-line px-1 font-mono text-[11px] leading-4 text-ink-3">demo data</span> : null}
         </>
       }
       actions={site.isDemo ? null : <RunAuditButton siteId={site.id} active={!!state.active} />}
@@ -96,7 +95,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
               <RunAuditButton siteId={site.id} active={!!state.active} />
             </div>
           )}
-          <Provenance source="scopekit" detail="crawler, no runs" className="mt-5" />
+          
         </Panel>
       </>
     );
@@ -154,7 +153,7 @@ async function Content({ params, searchParams }: { params: Promise<{ siteId: str
             unavailable={{ text: "First crawl", reason: "There is no earlier crawl to compare with" }}
             note={summary ? `${formatNumber(summary.resolvedIssues)} resolved` : undefined}
             source="scopekit"
-            sourceDetail={run.coverageComplete ? "complete crawls compared" : "partial: nothing unseen was resolved"}
+            sourceDetail={run.coverageComplete ? null : "partial crawl"}
           />
         </KpiRow>
         {!run.coverageComplete ? (
@@ -298,7 +297,7 @@ async function Issues({ site, sp, pathname, runId, tabs, timezone }: { site: { i
                       <th scope="row" className="max-w-[300px] py-3 pl-5 text-left font-normal">
                         <span className="block truncate font-mono text-[12px] leading-5 text-ink" title={issue.url}>{pathOfUrl(issue.url)}</span>
                         {issue.state === "snoozed" && issue.ignoredUntil ? <span className="block text-[12px] leading-4 text-ink-3">Snoozed until {issue.ignoredUntil}</span> : null}
-                        {issue.lastSeenRunId !== runId && issue.state === "open" ? <span className="block text-[12px] leading-4 text-ink-3">Not visited in the last crawl, so unchanged</span> : null}
+                        {issue.lastSeenRunId !== runId && issue.state === "open" ? <span className="block text-[12px] leading-4 text-ink-3">Not in last crawl</span> : null}
                       </th>
                       <td className="max-w-[360px] px-3 py-3"><Evidence evidence={issue.details.evidence} /></td>
                       <td className="px-3 py-3 whitespace-nowrap text-ink-2">
@@ -314,12 +313,12 @@ async function Issues({ site, sp, pathname, runId, tabs, timezone }: { site: { i
           ) : (
             <PanelEmpty title={`No ${STATE_LABELS[issueState].toLowerCase()} issues for this rule`} />
           )}
-          {detail.total > detail.rows.length ? <p className="border-t border-line px-5 py-3 text-[12px] leading-4 text-ink-3">Showing 100 of {formatNumber(detail.total)}. The CSV has all of them</p> : null}
+          {detail.total > detail.rows.length ? <p className="border-t border-line px-5 py-3 text-[12px] leading-4 text-ink-3">Showing 100 of {formatNumber(detail.total)}</p> : null}
         </Panel>
       ) : null}
 
       <Panel>
-        <PanelHeader title="Issues by rule" description="Worst first. Select a rule for the affected pages and what to do" meta={<Provenance source="scopekit" detail="crawler" />} action={tabs} />
+        <PanelHeader title="Issues by rule" meta={<Provenance source="scopekit" />} action={tabs} />
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 px-5 pb-2">
           <LinkTabs label="State" items={ISSUE_STATES.map((s) => ({ href: withParams(pathname, sp, { state: s === "open" ? null : s, rule: null }), label: STATE_LABELS[s], active: s === issueState }))} />
           <LinkTabs
@@ -368,9 +367,7 @@ async function Issues({ site, sp, pathname, runId, tabs, timezone }: { site: { i
             </table>
           </div>
         ) : (
-          <PanelEmpty title={issueState === "open" ? "No open issues match" : `Nothing is ${STATE_LABELS[issueState].toLowerCase()}`}>
-            {issueState === "open" && !severity && !path && !onlyNew ? "The crawl found nothing to report on the pages it visited" : "Change the filters to see more"}
-          </PanelEmpty>
+          <PanelEmpty title={issueState === "open" ? "No open issues match" : `Nothing is ${STATE_LABELS[issueState].toLowerCase()}`} />
         )}
       </Panel>
     </>
@@ -386,7 +383,7 @@ async function Pages({ sp, pathname, runId, tabs }: { sp: SearchParams; pathname
   const pages = Math.max(1, Math.ceil(table.total / limit));
   return (
     <Panel>
-      <PanelHeader title={`${formatNumber(table.total)} ${table.total === 1 ? "URL" : "URLs"}`} description="Everything the last crawl visited or was told about, as it answered" meta={<Provenance source="scopekit" detail="crawler" />} action={tabs} />
+      <PanelHeader title={`${formatNumber(table.total)} ${table.total === 1 ? "URL" : "URLs"}`} meta={<Provenance source="scopekit" />} action={tabs} />
       <div className="px-5 pb-2">
         <LinkTabs label="Show" items={PAGE_FILTERS.map((f) => ({ href: withParams(pathname, sp, { only: f.value, p: null }), label: f.label, active: f.value === only }))} />
       </div>
